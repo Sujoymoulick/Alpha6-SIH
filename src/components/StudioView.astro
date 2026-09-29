@@ -1,0 +1,427 @@
+---
+// Studio View: Multimodal Document & P&ID Agentic Studio (Executive Light Theme)
+---
+
+<div id="view-workflow" class="app-view hidden space-y-4 animate-fadeIn">
+  <!-- Studio Header -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
+          MULTIMODAL AGENTIC STUDIO
+        </span>
+        <span class="text-xs text-slate-500">Purdue Level 3 Local Execution</span>
+      </div>
+      <h2 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900 mt-1">
+        Industrial Blueprint &amp; SOP Execution Engine
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Execute end-to-end multimodal OCR, vector cross-referencing, and deterministic safety checks.
+      </p>
+    </div>
+
+    <!-- Workflow Preset Selector & Action -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      <div class="flex items-center gap-2">
+        <label for="studio-preset-select" class="text-xs text-slate-600 whitespace-nowrap font-semibold">Scenario:</label>
+        <select 
+          id="studio-preset-select" 
+          onchange="changeStudioPreset(this.value)"
+          class="bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        >
+          <option value="pid_analysis">1. P&amp;ID Drawing C-401 (Multimodal Vision)</option>
+          <option value="sop_verification">2. Hydrocracker Depressurization (SOP RAG)</option>
+          <option value="hitl_intervention">3. Steam Turbine ST-401 (HITL Interlock)</option>
+        </select>
+      </div>
+
+      <button 
+        type="button" 
+        id="btn-run-pipeline"
+        onclick="runAgenticPipeline()"
+        class="btn-primary-blue text-xs py-2 px-4 shadow-xs"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Execute Pipeline</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Studio Workspace: Split Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- Left Column: Interactive Blueprint Schematic & Tag Inspector (7 cols) -->
+    <div class="lg:col-span-7 space-y-4">
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-3.5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+            <span class="font-bold text-slate-900" id="studio-doc-title">P&amp;ID Schematic: DWG-CDU-401 (Sheet 2 of 4)</span>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-slate-100 text-slate-600 border border-slate-200">
+            ISA-5.1 STANDARD
+          </span>
+        </div>
+
+        <!-- Schematic Canvas Simulation -->
+        <div class="relative bg-slate-50 border border-slate-200 rounded-2xl p-5 overflow-hidden min-h-[340px] flex flex-col justify-between" id="blueprint-canvas">
+          <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] [background-size:20px_20px] opacity-70"></div>
+
+          <!-- Top status watermark -->
+          <div class="relative z-10 flex items-center justify-between text-[11px] font-mono text-slate-500 font-medium">
+            <span>MRPL REFINERY • CDU-1 BATTERY LIMIT</span>
+            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 text-blue-700 font-semibold shadow-2xs">TAG ISOLATION: ACTIVE</span>
+          </div>
+
+          <!-- Piping Flow Line with Highlighted Tag Nodes -->
+          <div class="relative z-10 my-4 flex flex-col items-center justify-center space-y-5">
+            <div class="w-full flex items-center justify-between px-4 text-xs font-mono text-slate-500">
+              <span>Line: <strong class="text-slate-700">24"-VAP-4011-CS</strong> (Overhead Vapor)</span>
+              <span>Discharge: <strong class="text-slate-700">36"-FL-4001</strong> (Flare Header)</span>
+            </div>
+
+            <div class="w-full relative flex items-center justify-center py-7">
+              <div class="absolute w-4/5 h-1 bg-slate-300 rounded-full"></div>
+
+              <div class="relative flex items-center justify-between w-4/5">
+                <!-- Column C-401 -->
+                <button 
+                  type="button"
+                  onclick="inspectTagById('C-401')"
+                  class="tag-node group relative px-3 py-2 rounded-xl bg-white border border-blue-400 hover:border-blue-600 text-blue-700 font-mono text-xs font-bold shadow-xs transition-all cursor-pointer"
+                  aria-label="Inspect equipment tag C-401"
+                >
+                  [C-401]
+                  <span class="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-sans whitespace-nowrap font-medium">Fractionator</span>
+                </button>
+
+                <!-- Flow Transmitter FT-4011 -->
+                <button 
+                  type="button"
+                  onclick="inspectTagById('FT-4011')"
+                  class="tag-node group relative px-3 py-2 rounded-xl bg-white border border-slate-300 hover:border-blue-400 text-slate-700 font-mono text-xs font-medium shadow-xs transition-all cursor-pointer"
+                  aria-label="Inspect equipment tag FT-4011"
+                >
+                  FT-4011
+                  <span class="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-400 font-sans whitespace-nowrap font-medium">Flow</span>
+                </button>
+
+                <!-- Relief Valve PSV-2041 (The primary highlighted tag!) -->
+                <button 
+                  type="button"
+                  onclick="inspectTagById('PSV-2041')"
+                  class="tag-node group relative px-3.5 py-2 rounded-xl bg-amber-50 border-2 border-amber-400 hover:border-amber-500 text-amber-900 font-mono text-xs font-extrabold shadow-sm animate-pulse-subtle transition-all cursor-pointer"
+                  aria-label="Inspect primary safety valve PSV-2041"
+                >
+                  ★ [PSV-2041]
+                  <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-sans text-amber-700 font-bold whitespace-nowrap uppercase tracking-wider">CRITICAL RELIEF</span>
+                </button>
+
+                <!-- Flow Control Valve FCV-4012 -->
+                <button 
+                  type="button"
+                  onclick="inspectTagById('FCV-4012')"
+                  class="tag-node group relative px-3 py-2 rounded-xl bg-white border border-slate-300 hover:border-blue-400 text-slate-700 font-mono text-xs font-medium shadow-xs transition-all cursor-pointer"
+                  aria-label="Inspect equipment tag FCV-4012"
+                >
+                  FCV-4012
+                  <span class="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-400 font-sans whitespace-nowrap font-medium">Reflux</span>
+                </button>
+
+                <!-- Shutoff Valve XV-4001 -->
+                <button 
+                  type="button"
+                  onclick="inspectTagById('XV-4001')"
+                  class="tag-node group relative px-3 py-2 rounded-xl bg-rose-50 border border-rose-300 hover:border-rose-400 text-rose-700 font-mono text-xs font-bold shadow-xs transition-all cursor-pointer"
+                  aria-label="Inspect equipment tag XV-4001"
+                >
+                  XV-4001
+                  <span class="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-rose-600 font-sans whitespace-nowrap font-medium">ESD Trip</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-500 font-medium">
+              Select any symbol in the schematic to view its engineering datasheets and setpoints.
+            </div>
+          </div>
+
+          <!-- Bottom interactive Tag Inspector Drawer -->
+          <div id="tag-inspector-box" class="relative z-10 bg-white border border-slate-200/90 rounded-xl p-3.5 mt-2 shadow-xs transition-all">
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-bold text-blue-700" id="tag-inspector-name">PSV-2041</span>
+                <span class="text-slate-600 font-medium" id="tag-inspector-desc">Primary Safety Relief Valve</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono text-slate-400 hidden sm:inline" id="tag-inspector-source">MDS-PSV-2041 / Grid D-7</span>
+                <button 
+                  type="button" 
+                  onclick="queryTagInCopilot()"
+                  class="px-2.5 py-1 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 flex items-center gap-1 transition-all cursor-pointer"
+                >
+                  <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                  <span>Query in Copilot</span>
+                </button>
+              </div>
+            </div>
+            <p class="text-xs text-slate-700 mt-2 leading-relaxed font-mono" id="tag-inspector-detail">
+              Set Cracking: 4.80 barg (70 psig). Capacity: 185,000 kg/hr. Discharges into 36"-FL-4001 Flare Header. Car-Seal Locked Open (CSO).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: 5-Stage Agentic Pipeline Progression (5 cols) -->
+    <div class="lg:col-span-5 space-y-4">
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-3.5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pipeline Execution Telemetry</h3>
+          </div>
+          <span class="text-xs font-mono text-slate-400 font-semibold" id="pipeline-status-badge">READY</span>
+        </div>
+
+        <!-- 5 Steps List -->
+        <div class="space-y-2.5" id="pipeline-steps-container">
+          <!-- Step 1 -->
+          <div class="pipeline-step-card p-3 rounded-xl bg-slate-50 border border-slate-200 transition-all" id="step-card-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-mono font-bold step-badge shadow-2xs">1</span>
+                Policy Gate &amp; Boundary Check
+              </span>
+              <span class="step-timing text-xs font-mono text-slate-400 tabular-nums">Pending</span>
+            </div>
+            <p class="step-desc text-xs text-slate-500 mt-1 pl-7">Zero data egress validation &amp; RBAC classification.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="pipeline-step-card p-3 rounded-xl bg-slate-50 border border-slate-200 transition-all" id="step-card-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-mono font-bold step-badge shadow-2xs">2</span>
+                Multimodal OCR &amp; Vectorization
+              </span>
+              <span class="step-timing text-xs font-mono text-slate-400 tabular-nums">Pending</span>
+            </div>
+            <p class="step-desc text-xs text-slate-500 mt-1 pl-7">OpenCV contours &amp; ISA-5.1 tag recognition.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="pipeline-step-card p-3 rounded-xl bg-slate-50 border border-slate-200 transition-all" id="step-card-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-mono font-bold step-badge shadow-2xs">3</span>
+                Qdrant Hybrid Retrieval
+              </span>
+              <span class="step-timing text-xs font-mono text-slate-400 tabular-nums">Pending</span>
+            </div>
+            <p class="step-desc text-xs text-slate-500 mt-1 pl-7">Cross-reference equipment manuals &amp; datasheets.</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="pipeline-step-card p-3 rounded-xl bg-slate-50 border border-slate-200 transition-all" id="step-card-4">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-mono font-bold step-badge shadow-2xs">4</span>
+                Local Open-Weight Model Reasoning
+              </span>
+              <span class="step-timing text-xs font-mono text-slate-400 tabular-nums">Pending</span>
+            </div>
+            <p class="step-desc text-xs text-slate-500 mt-1 pl-7">vLLM / Ollama offline token generation.</p>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="pipeline-step-card p-3 rounded-xl bg-slate-50 border border-slate-200 transition-all" id="step-card-5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-mono font-bold step-badge shadow-2xs">5</span>
+                Deterministic Verifier &amp; HITL Gate
+              </span>
+              <span class="step-timing text-xs font-mono text-slate-400 tabular-nums">Pending</span>
+            </div>
+            <p class="step-desc text-xs text-slate-500 mt-1 pl-7">Citation verification &amp; supervisory action gate.</p>
+          </div>
+        </div>
+
+        <!-- Pipeline Result Box -->
+        <div id="pipeline-result-box" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-emerald-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Pipeline Output Verified
+            </span>
+            <span class="font-mono text-xs font-bold text-emerald-700 tabular-nums" id="pipeline-total-time">Total: 606 ms</span>
+          </div>
+          <p class="text-xs text-slate-700 leading-relaxed font-sans" id="pipeline-summary-text">
+            Successfully parsed P&amp;ID Drawing DWG-CDU-401. Relief valve PSV-2041 confirmed mounted on 24" overhead line with 4.80 barg setpoint discharging into flare header 36"-FL-4001. All ISA-5.1 symbols verified.
+          </p>
+          <div class="flex flex-wrap gap-1.5 text-xs font-mono" id="pipeline-citations-container">
+            <span class="px-2.5 py-0.5 rounded-md bg-white border border-emerald-200 text-emerald-800 font-medium">DWG-CDU-401 Sheet 2 (98%)</span>
+            <span class="px-2.5 py-0.5 rounded-md bg-white border border-emerald-200 text-emerald-800 font-medium">MDS-PSV-2041 Datasheet (99%)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  const TAGS_DATA = {
+    'C-401': {
+      name: 'C-401',
+      desc: 'Crude Distillation Column Overhead',
+      detail: 'Column Top Elevation +42.5m. Sump level interlocked with ESD-101. Operating Temp: 165°C.',
+      source: 'DWG-CDU-401 Sheet 2'
+    },
+    'FT-4011': {
+      name: 'FT-4011',
+      desc: 'Vapor Flow Transmitter (Orifice Plate)',
+      detail: 'Differential pressure cell calibrated for 0 - 220,000 kg/hr hydrocarbon vapor. SIL-2 certified.',
+      source: 'DWG-CDU-401 Grid B-4'
+    },
+    'PSV-2041': {
+      name: 'PSV-2041',
+      desc: 'Primary Safety Relief Valve',
+      detail: 'Set Cracking: 4.80 barg (70 psig). Capacity: 185,000 kg/hr. Discharges into 36"-FL-4001 Flare Header. Car-Seal Locked Open (CSO).',
+      source: 'MDS-PSV-2041 / Grid D-7'
+    },
+    'FCV-4012': {
+      name: 'FCV-4012',
+      desc: 'Reflux Return Flow Control Valve',
+      detail: 'Air-to-open pneumatic globe valve with smart electro-pneumatic positioner. Fail-Closed position.',
+      source: 'DWG-CDU-401 Grid C-6'
+    },
+    'XV-4001': {
+      name: 'XV-4001',
+      desc: 'Emergency Quench Shutoff Valve',
+      detail: 'Spring-return quarter-turn ball valve tied to ESD-101 trip matrix. Fast close time: <1.2 seconds.',
+      source: 'SIS-CDU-ESD101 Tab 4'
+    }
+  };
+
+  function inspectTagById(id) {
+    const item = TAGS_DATA[id];
+    if (!item) return;
+    document.getElementById('tag-inspector-name').textContent = item.name;
+    document.getElementById('tag-inspector-desc').textContent = item.desc;
+    document.getElementById('tag-inspector-detail').textContent = item.detail;
+    document.getElementById('tag-inspector-source').textContent = item.source;
+
+    const box = document.getElementById('tag-inspector-box');
+    box.classList.add('border-blue-400');
+    setTimeout(() => box.classList.remove('border-blue-400'), 400);
+  }
+
+  function queryTagInCopilot() {
+    const tagName = document.getElementById('tag-inspector-name').textContent.trim();
+    if (!tagName) return;
+    switchTab('copilot');
+    setTimeout(() => {
+      submitPresetQuery(`What are the technical specifications, interlocks, and setpoints for ${tagName}?`);
+    }, 120);
+  }
+
+  function changeStudioPreset(val) {
+    const titleEl = document.getElementById('studio-doc-title');
+    if (val === 'pid_analysis') {
+      titleEl.textContent = 'P&ID Schematic: DWG-CDU-401 (Sheet 2 of 4)';
+    } else if (val === 'sop_verification') {
+      titleEl.textContent = 'Standard Operating Procedure: SOP-HCU-EP-018 (Emergency Depressurization)';
+    } else if (val === 'hitl_intervention') {
+      titleEl.textContent = 'Machinery Telemetry & Alarm Feed: Steam Turbine ST-401';
+    }
+    resetPipelineStepsUI();
+  }
+
+  function resetPipelineStepsUI() {
+    document.getElementById('pipeline-status-badge').textContent = 'READY';
+    document.getElementById('pipeline-status-badge').className = 'text-xs font-mono text-slate-400 font-semibold';
+    document.getElementById('pipeline-result-box').classList.add('hidden');
+
+    for (let i = 1; i <= 5; i++) {
+      const card = document.getElementById(`step-card-${i}`);
+      card.className = 'pipeline-step-card p-3 rounded-xl bg-slate-50 border border-slate-200 transition-all';
+      const badge = card.querySelector('.step-badge');
+      badge.className = 'w-5 h-5 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-mono font-bold step-badge shadow-2xs';
+      badge.textContent = i.toString();
+      card.querySelector('.step-timing').textContent = 'Pending';
+      card.querySelector('.step-timing').className = 'step-timing text-xs font-mono text-slate-400 tabular-nums';
+    }
+  }
+
+  async function runAgenticPipeline() {
+    const btn = document.getElementById('btn-run-pipeline');
+    const preset = document.getElementById('studio-preset-select').value;
+    btn.disabled = true;
+    btn.classList.add('opacity-70');
+
+    resetPipelineStepsUI();
+    document.getElementById('pipeline-status-badge').textContent = 'EXECUTING…';
+    document.getElementById('pipeline-status-badge').className = 'text-xs font-mono text-blue-600 font-bold animate-pulse';
+
+    try {
+      const res = await fetch('/api/workflow/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workflowType: preset })
+      });
+      const data = await res.json();
+      const workflow = data.workflow;
+
+      let totalElapsed = 0;
+      for (const step of workflow.steps) {
+        await new Promise(r => setTimeout(r, 200));
+        const card = document.getElementById(`step-card-${step.stepNumber}`);
+        card.className = 'pipeline-step-card p-3 rounded-xl bg-emerald-50/70 border border-emerald-300 transition-all shadow-xs';
+        const badge = card.querySelector('.step-badge');
+        badge.className = 'w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-mono font-bold step-badge shadow-2xs';
+        badge.textContent = '✓';
+        card.querySelector('.step-timing').textContent = `${step.latencyMs} ms`;
+        card.querySelector('.step-timing').className = 'step-timing text-xs font-mono text-emerald-700 tabular-nums font-bold';
+        card.querySelector('.step-desc').textContent = step.detail;
+        totalElapsed += step.latencyMs;
+      }
+
+      const resultBox = document.getElementById('pipeline-result-box');
+      resultBox.classList.remove('hidden');
+      document.getElementById('pipeline-summary-text').textContent = workflow.finalOutput.executiveSummary;
+      document.getElementById('pipeline-total-time').textContent = `Total: ${totalElapsed} ms`;
+
+      const citationsContainer = document.getElementById('pipeline-citations-container');
+      citationsContainer.innerHTML = '';
+      for (const cit of workflow.finalOutput.groundedCitations) {
+        const span = document.createElement('span');
+        span.className = 'px-2.5 py-0.5 rounded-md bg-white border border-emerald-200 text-emerald-800 font-medium';
+        span.textContent = `${cit.source} (${Math.round(cit.confidence * 100)}%)`;
+        citationsContainer.appendChild(span);
+      }
+
+      document.getElementById('pipeline-status-badge').textContent = 'COMPLETED';
+      document.getElementById('pipeline-status-badge').className = 'text-xs font-mono text-emerald-700 font-bold';
+
+      if (workflow.finalOutput.requiresHitl) {
+        showToast('HITL Required', 'Action held at supervisory escrow gate in Records Vault.', 'warning');
+      } else {
+        showToast('Pipeline Verified', 'Evidence-first reasoning complete.', 'success');
+      }
+
+    } catch (err) {
+      showToast('Pipeline Error', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('opacity-70');
+    }
+  }
+</script>

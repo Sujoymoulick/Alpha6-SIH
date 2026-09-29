@@ -1,0 +1,753 @@
+---
+import { KNOWLEDGE_BASE, SUGGESTED_QUERIES } from '../data/knowledgeBase';
+
+const KB_CATALOG = KNOWLEDGE_BASE.map(item => ({
+  id: item.id,
+  category: item.intent,
+  question: item.question,
+  intent: item.intent
+}));
+---
+
+<div id="view-copilot" class="app-view hidden h-full flex flex-col space-y-3 animate-fadeIn">
+  <!-- Top Technical Header -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <h2 class="text-xs sm:text-sm font-semibold text-slate-900 tracking-tight font-sans">
+          Plant Copilot // Sovereign Industrial Assistant
+        </h2>
+      </div>
+      <span class="text-slate-300 hidden sm:inline">|</span>
+      <div class="flex items-center gap-1.5 text-xs font-mono text-slate-500">
+        <span>ENGINE:</span>
+        <span class="text-blue-600 font-semibold" id="copilot-engine-label">Llama-3-8B-Industrial (vLLM)</span>
+      </div>
+      <span class="text-slate-300 hidden md:inline">|</span>
+      <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hidden md:inline">
+        0.00 KB EGRESS • AIR-GAPPED
+      </span>
+    </div>
+
+    <!-- Actions: Clear & Export -->
+    <div class="flex items-center gap-2">
+      <button 
+        type="button" 
+        onclick="clearChatTranscript()" 
+        class="btn-secondary-light text-xs py-1.5 px-3"
+        title="Clear current transcript"
+      >
+        Clear
+      </button>
+
+      <button 
+        type="button" 
+        onclick="exportChatTranscript()" 
+        class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+        title="Export cryptographic JSON audit transcript"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span>Export Audit Log</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3-PANE COPILOT WORKSPACE -->
+  <div class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3 min-h-0 overflow-hidden">
+    <!-- PANE 1: Left - Conversation History & Industrial Sessions (3 cols) -->
+    <div class="hidden md:flex md:col-span-3 flex-col bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+      <!-- Session Bar Header -->
+      <div class="p-3 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+        <span class="text-[11px] font-semibold text-slate-600 uppercase tracking-wider">Operational Sessions</span>
+        <button 
+          type="button" 
+          onclick="startNewSession()"
+          class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-medium transition-colors cursor-pointer shadow-xs"
+        >
+          + New Query
+        </button>
+      </div>
+
+      <!-- Session List Container -->
+      <div class="flex-1 overflow-y-auto p-2.5 space-y-2" id="copilot-sessions-list">
+        <!-- Session 1: Pump P-204 (Active) -->
+        <button 
+          type="button"
+          onclick="loadSession('session-p204')"
+          id="sess-item-session-p204"
+          class="session-nav-item active w-full p-2.5 rounded-xl bg-blue-50/90 border border-blue-300 text-left transition-all cursor-pointer shadow-xs"
+        >
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-blue-700 font-bold">SOP-PMP-204</span>
+            <span class="text-slate-400">00:08</span>
+          </div>
+          <div class="text-xs font-semibold text-slate-900 truncate mt-0.5">Startup Procedure: Pump P-204</div>
+          <div class="text-[11px] text-slate-500 truncate font-mono mt-0.5">CDU-1 • Plan 53A Verified</div>
+        </button>
+
+        <!-- Session 2: P&ID Drawing C-401 -->
+        <button 
+          type="button"
+          onclick="loadSession('session-pid401')"
+          id="sess-item-session-pid401"
+          class="session-nav-item w-full p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-left transition-all cursor-pointer"
+        >
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-indigo-600 font-bold">DWG-CDU-401</span>
+            <span class="text-slate-400">20:12</span>
+          </div>
+          <div class="text-xs font-semibold text-slate-800 truncate mt-0.5">Relief Valve PSV-2041 Set Point</div>
+          <div class="text-[11px] text-slate-500 truncate font-mono mt-0.5">Crude Tower Overhead • 4.8 barg</div>
+        </button>
+
+        <!-- Session 3: Hydrocracker Depressurization -->
+        <button 
+          type="button"
+          onclick="loadSession('session-hcu3')"
+          id="sess-item-session-hcu3"
+          class="session-nav-item w-full p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-left transition-all cursor-pointer"
+        >
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-rose-600 font-bold">SOP-HCU-EP</span>
+            <span class="text-slate-400">22:14</span>
+          </div>
+          <div class="text-xs font-semibold text-slate-800 truncate mt-0.5">HCU-3 Emergency Blowdown</div>
+          <div class="text-[11px] text-slate-500 truncate font-mono mt-0.5">BDV-301A/B 21 barg/min</div>
+        </button>
+
+        <!-- Session 4: Turbine ST-401 Vibration -->
+        <button 
+          type="button"
+          onclick="loadSession('session-turb401')"
+          id="sess-item-session-turb401"
+          class="session-nav-item w-full p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-left transition-all cursor-pointer"
+        >
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-amber-600 font-bold">MNT-TURB-401</span>
+            <span class="text-slate-400">23:58</span>
+          </div>
+          <div class="text-xs font-semibold text-slate-800 truncate mt-0.5">ST-401 Vibration HH 7.6 mm/s</div>
+          <div class="text-[11px] text-slate-500 truncate font-mono mt-0.5">Governor Valve 15% Throttle</div>
+        </button>
+
+        <!-- Session 5: SRU-2 H2S Safety -->
+        <button 
+          type="button"
+          onclick="loadSession('session-h2s')"
+          id="sess-item-session-h2s"
+          class="session-nav-item w-full p-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-left transition-all cursor-pointer"
+        >
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-emerald-600 font-bold">MSDS-H2S</span>
+            <span class="text-slate-400">Yesterday</span>
+          </div>
+          <div class="text-xs font-semibold text-slate-800 truncate mt-0.5">SRU-2 Exposure Limits &amp; SCBA</div>
+          <div class="text-[11px] text-slate-500 truncate font-mono mt-0.5">PEL 20ppm • IDLH 100ppm</div>
+        </button>
+      </div>
+
+      <!-- Bottom Session Status -->
+      <div class="p-2.5 bg-slate-50 border-t border-slate-200 text-[11px] font-mono text-slate-500 flex items-center justify-between">
+        <span>SESSION MEMORY: LOCAL</span>
+        <span class="text-emerald-600 font-semibold">RAM: 42 KB</span>
+      </div>
+    </div>
+
+    <!-- PANE 2: Center - Chat Interface & Quick Chips (6 cols) -->
+    <div class="col-span-1 md:col-span-6 flex flex-col bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+      <!-- Quick Prompt Chips Strip -->
+      <div class="p-2.5 bg-slate-50/80 border-b border-slate-200 space-y-1.5 shrink-0">
+        <div class="flex items-center justify-between text-[11px] font-medium text-slate-500">
+          <span class="uppercase tracking-wider">Quick Operational Prompt Chips</span>
+          <span class="text-blue-600 font-mono text-[10px]">1-CLICK DISPATCH</span>
+        </div>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="quick-prompt-chips">
+          <button 
+            type="button"
+            onclick="submitPresetQuery('What is the safe startup procedure for Pump P-204?')"
+            class="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-blue-200 hover:border-blue-400 text-blue-700 text-xs font-medium transition-all shadow-xs cursor-pointer"
+            title="Safe startup procedure for Pump P-204"
+          >
+            ⚡ Startup Pump P-204
+          </button>
+          <button 
+            type="button"
+            onclick="submitPresetQuery('Explain an alarm: Steam Turbine ST-401 High Vibration')"
+            class="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium transition-all shadow-xs cursor-pointer"
+            title="Explain high vibration alarm on Steam Turbine ST-401"
+          >
+            🔔 Explain an alarm
+          </button>
+          <button 
+            type="button"
+            onclick="submitPresetQuery('Find an SOP: Safe startup procedure for Heavy Crude Booster Pump P-204')"
+            class="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium transition-all shadow-xs cursor-pointer"
+            title="Find an SOP document"
+          >
+            📄 Find an SOP
+          </button>
+          <button 
+            type="button"
+            onclick="submitPresetQuery('Analyze equipment logs: Crude Fractionator Tower C-401 DCS Telemetry')"
+            class="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium transition-all shadow-xs cursor-pointer"
+            title="Analyze equipment logs"
+          >
+            📊 Analyze logs
+          </button>
+          <button 
+            type="button"
+            onclick="submitPresetQuery('Retrieve safety procedures: Mandatory PPE and exposure limits for H2S in SRU-2')"
+            class="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium transition-all shadow-xs cursor-pointer"
+            title="Retrieve safety procedures"
+          >
+            🛡️ Safety procedures
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Scroll Container -->
+      <div 
+        id="chat-messages-container" 
+        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/40"
+        role="log"
+        aria-live="polite"
+        tabindex="0"
+      >
+        <!-- Initial Assistant Greeting -->
+        <div class="chat-message assistant-message flex items-start gap-3 max-w-full">
+          <div class="w-7 h-7 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center shrink-0 font-bold text-blue-700 text-xs shadow-xs">
+            α6
+          </div>
+          <div class="flex-1 space-y-1.5">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="font-bold text-slate-900">Alpha-6 Sovereign Copilot</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-medium">AIR-GAPPED L3</span>
+              <span class="text-slate-400 font-mono text-[11px]">Ready</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs text-xs text-slate-700 space-y-2.5 leading-relaxed">
+              <p>
+                Plant Copilot initialized under air-gapped industrial boundary. Responses are deterministically cross-referenced against approved refinery SOPs, P&amp;ID blueprints, and DCS matrices.
+              </p>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono text-[11px] text-slate-600 space-y-1">
+                <div class="flex items-center gap-1.5"><span class="text-emerald-600">✓</span> Zero external cloud egress (eBPF packet filter verified)</div>
+                <div class="flex items-center gap-1.5"><span class="text-emerald-600">✓</span> Citation verification on every statement</div>
+                <div class="flex items-center gap-1.5"><span class="text-blue-600">✓</span> Human-in-the-Loop supervisory gate active for equipment commands</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Loading Indicator -->
+      <div id="chat-loading-indicator" class="hidden px-4 py-2.5 bg-blue-50/80 border-t border-blue-100 flex items-center gap-2 text-xs text-blue-700 font-medium shrink-0">
+        <svg class="w-4 h-4 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Policy Gate pre-checking query &amp; executing Qdrant hybrid retrieval…</span>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form 
+        id="chat-input-form" 
+        onsubmit="handleChatSubmit(event)"
+        class="p-3 bg-white border-t border-slate-200 flex items-center gap-2.5 shrink-0"
+      >
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            id="chat-user-input" 
+            name="userQuery"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Ask about SOP procedures, P&ID valve tags (e.g. PSV-2041), emergency depressurization, Pump P-204…" 
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-sans transition-all"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          id="btn-chat-send"
+          class="btn-primary-blue py-2.5 px-4 shrink-0 shadow-xs"
+        >
+          <span>Send</span>
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- PANE 3: Right - Contextual Evidence Panel & Telemetry (3 cols) -->
+    <div class="hidden md:flex md:col-span-3 flex-col bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+      <!-- Evidence Header -->
+      <div class="p-3 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+        <span class="text-[11px] font-semibold text-slate-600 uppercase tracking-wider">Contextual Evidence Panel</span>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-blue-50 text-blue-700 border border-blue-200">
+          INSPECTOR
+        </span>
+      </div>
+
+      <!-- Evidence Panel Scroll Body -->
+      <div class="flex-1 overflow-y-auto p-3.5 space-y-3" id="evidence-panel-body">
+        <!-- Active Citation Meta Card -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Active SOP / Document</div>
+          <div class="text-xs font-bold text-blue-700 font-mono" id="evidence-doc-id">SOP-PMP-204-OPS</div>
+          <div class="text-xs font-semibold text-slate-900" id="evidence-doc-title">Heavy Crude Booster Pump P-204 Safe Startup &amp; Lineup</div>
+          <div class="text-[11px] text-slate-500 font-mono" id="evidence-doc-section">Section §3.4 Suction Priming • Page 12</div>
+        </div>
+
+        <!-- Document Excerpt Snippet with Highlight -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between text-[10px] font-mono uppercase">
+            <span class="text-slate-500">Verified Source Excerpt</span>
+            <span class="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">EXACT MATCH</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 text-[11px] text-slate-700 font-mono leading-relaxed max-h-40 overflow-y-auto shadow-2xs" id="evidence-excerpt">
+            "§3.4 Suction Priming: Check Barrier Fluid Vessel (V-204) pressure >= 4.8 barg (1.5 bar differential above seal chamber). Slowly open suction valve MOV-2040 100% (CSO). Confirm suction PI-2041 >= 2.4 barg. Minimum flow bypass FCV-2042 verified OPEN before motor energization."
+          </div>
+        </div>
+
+        <!-- Confidence Gauge -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-slate-500 uppercase text-[10px]">Retrieval Confidence</span>
+            <span class="text-emerald-600 font-bold tabular-nums" id="evidence-confidence-score">99.4%</span>
+          </div>
+          <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full transition-all" id="evidence-confidence-bar" style="width: 99.4%"></div>
+          </div>
+          <div class="text-[10px] font-mono text-slate-500 flex items-center justify-between">
+            <span>Ranking: <strong class="text-slate-800">Qdrant RRF #1</strong></span>
+            <span>Chunks: <strong class="text-slate-800">4 vectors</strong></span>
+          </div>
+        </div>
+
+        <!-- Policy Gate Status -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Policy Gate Verdict</div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-emerald-700 font-semibold" id="evidence-policy-verdict">POLICY ALLOWED</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">0 REDACTIONS</span>
+          </div>
+          <div class="text-[11px] font-mono text-slate-500">eBPF egress filter verified: 0.00 KB outbound.</div>
+        </div>
+
+        <!-- Raw Telemetry Inspector -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Execution Telemetry</div>
+          <div class="space-y-1.5 text-xs font-mono text-slate-700">
+            <div class="flex justify-between">
+              <span class="text-slate-500">Model:</span>
+              <span class="font-medium text-slate-900" id="evidence-tel-model">Llama-3-8B-Industrial</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Latency:</span>
+              <span class="text-emerald-600 font-semibold tabular-nums" id="evidence-tel-latency">385 ms</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Throughput:</span>
+              <span class="text-blue-600 font-semibold tabular-nums" id="evidence-tel-throughput">84.2 tok/s</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Audit Hash:</span>
+              <span class="text-slate-600 truncate max-w-[130px]" id="evidence-tel-hash">sha256-8f4e2a1b9c7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="kb-catalog-data" set:html={JSON.stringify(KB_CATALOG)} />
+
+<script is:inline>
+  let chatHistory = [];
+
+  const SESSIONS_DATA = {
+    'session-p204': {
+      query: "What is the safe startup procedure for Pump P-204?",
+      title: "Startup Procedure: Pump P-204",
+      docId: "SOP-PMP-204-OPS",
+      docTitle: "Heavy Crude Booster Pump P-204 Safe Startup & Lineup",
+      section: "§3.4 Suction Priming • Page 12",
+      excerpt: "§3.4 Suction Priming: Check Barrier Fluid Vessel (V-204) pressure >= 4.8 barg (1.5 bar differential above seal chamber). Slowly open suction valve MOV-2040 100% (CSO). Confirm suction PI-2041 >= 2.4 barg. Minimum flow bypass FCV-2042 verified OPEN before motor energization.",
+      confidence: 0.994,
+      latency: "385 ms",
+      model: "Llama-3-8B-Industrial"
+    },
+    'session-pid401': {
+      query: "Where is safety relief valve PSV-2041 located and what is its set cracking pressure?",
+      title: "Relief Valve PSV-2041 Set Point",
+      docId: "DWG-CDU-401",
+      docTitle: "P&ID: Crude Fractionator Tower Overhead C-401",
+      section: "Grid Coordinate D-7 • Page 2",
+      excerpt: "Grid D-7: PSV-2041 installed on 24\"-VAP-4011-CS at El. +42.500m. Set pressure: 4.80 barg. Relieving capacity: 185,000 kg/hr hydrocarbon vapor into 36\"-FL-4001 High Pressure Flare Header.",
+      confidence: 0.982,
+      latency: "640 ms",
+      model: "Qwen-2.5-VL-7B"
+    },
+    'session-hcu3': {
+      query: "What is the step-by-step emergency depressurization protocol for Hydrocracker Unit HCU-3?",
+      title: "HCU-3 Emergency Blowdown",
+      docId: "SOP-HCU-EP-018",
+      docTitle: "Hydrocracker Emergency Depressurization Standard",
+      section: "§5.1 Blowdown Sequence • Page 31",
+      excerpt: "§5.1 Emergency Blowdown Initiation: Depressurize high-pressure loop from 145 barg to 25 barg at controlled rate of 21 barg/min. Trip furnace F-301 burners and inject emergency snuffing steam.",
+      confidence: 0.998,
+      latency: "395 ms",
+      model: "Llama-3-8B-Industrial"
+    },
+    'session-turb401': {
+      query: "How should operators respond to high vibration alarm (HH > 7.2 mm/s) on Steam Turbine ST-401?",
+      title: "ST-401 Vibration HH 7.6 mm/s",
+      docId: "MNT-TURB-401",
+      docTitle: "Steam Turbine ST-401 Operation & Maintenance Manual",
+      section: "§8.4 Vibration Anomalies • Page 64",
+      excerpt: "§8.4 Vibration Anomalies: Vibration exceeding 7.2 mm/s RMS on Drive End Bearing #1 mandates immediate load reduction via 15% throttle of governor valve MSV-401. If unresolved after 120s, trip turbine.",
+      confidence: 0.965,
+      latency: "412 ms",
+      model: "Llama-3-8B-Industrial"
+    },
+    'session-h2s': {
+      query: "What are the mandatory PPE and exposure limits for H2S in SRU-2?",
+      title: "SRU-2 Exposure Limits & SCBA",
+      docId: "MSDS-H2S-2025",
+      docTitle: "Safety Data Sheet: Hydrogen Sulfide Gas & Sulfur Hazards",
+      section: "§8 Exposure Controls • Page 4",
+      excerpt: "§8 Exposure Controls: OSHA PEL Ceiling 20 ppm; IDLH 100 ppm. Continuous wearable multi-gas monitor required. Positive-pressure SCBA required for all line breaking and battery limit entries.",
+      confidence: 0.998,
+      latency: "310 ms",
+      model: "Llama-3-8B-Industrial"
+    }
+  };
+
+  function submitPresetQuery(query) {
+    const input = document.getElementById('chat-user-input');
+    if (input) input.value = query;
+    const form = document.getElementById('chat-input-form');
+    if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
+  }
+
+  function startNewSession() {
+    clearChatTranscript();
+    const input = document.getElementById('chat-user-input');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+    showToast('New Session', 'Initialized fresh operational inquiry session.', 'info');
+  }
+
+  function loadSession(sessionId) {
+    document.querySelectorAll('.session-nav-item').forEach(el => {
+      el.classList.remove('active', 'bg-blue-50/90', 'border-blue-300');
+      el.classList.add('bg-white', 'border-slate-200');
+    });
+    const selected = document.getElementById(`sess-item-${sessionId}`);
+    if (selected) {
+      selected.classList.add('active', 'bg-blue-50/90', 'border-blue-300');
+      selected.classList.remove('bg-white', 'border-slate-200');
+    }
+
+    const sess = SESSIONS_DATA[sessionId];
+    if (sess) {
+      submitPresetQuery(sess.query);
+      updateEvidencePanel({
+        citations: [{
+          docId: sess.docId,
+          title: sess.docTitle,
+          section: sess.section,
+          page: 12
+        }],
+        confidence: sess.confidence,
+        policyStatus: 'ALLOWED',
+        executionTelemetry: {
+          model: sess.model,
+          latencyMs: parseInt(sess.latency),
+          tokensPerSec: 84
+        }
+      });
+      const excerptEl = document.getElementById('evidence-excerpt');
+      if (excerptEl) excerptEl.textContent = sess.excerpt;
+    }
+  }
+
+  async function handleChatSubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById('chat-user-input');
+    const query = input.value.trim();
+    if (!query) return;
+
+    input.value = '';
+    appendUserMessage(query);
+
+    const sendBtn = document.getElementById('btn-chat-send');
+    const loading = document.getElementById('chat-loading-indicator');
+    if (sendBtn) sendBtn.disabled = true;
+    if (loading) loading.classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
+      });
+      const data = await res.json();
+      appendAssistantMessage(data);
+      updateEvidencePanel(data);
+      chatHistory.push({ query, response: data, timestamp: new Date().toISOString() });
+    } catch (err) {
+      appendErrorMessage(err.message);
+    } finally {
+      if (sendBtn) sendBtn.disabled = false;
+      if (loading) loading.classList.add('hidden');
+      if (input) input.focus();
+    }
+  }
+
+  function appendUserMessage(text) {
+    const container = document.getElementById('chat-messages-container');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message user-message flex items-start justify-end gap-3';
+    msgDiv.innerHTML = `
+      <div class="flex-1 max-w-xl space-y-1 text-right">
+        <div class="flex items-center justify-end gap-2 text-[11px] font-mono text-slate-400">
+          <span class="font-medium text-slate-600">K. Raman</span>
+          <span class="tabular-nums">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="p-3 rounded-2xl bg-blue-600 text-white text-xs font-medium leading-relaxed inline-block text-left shadow-xs">
+          ${escapeHtml(text)}
+        </div>
+      </div>
+      <div class="w-7 h-7 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center shrink-0 font-bold text-blue-700 text-xs shadow-xs">
+        KR
+      </div>
+    `;
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function appendAssistantMessage(data) {
+    const container = document.getElementById('chat-messages-container');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message assistant-message flex items-start gap-3 max-w-full animate-fadeIn';
+
+    const policyBadge = data.policyStatus === 'REDACTED'
+      ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-amber-50 text-amber-700 border border-amber-200">PROPRIETARY REDACTED</span>`
+      : data.policyStatus === 'HITL_REQUIRED'
+      ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-rose-50 text-rose-700 border border-rose-200">HITL GATE REQUIRED</span>`
+      : `<span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">POLICY ALLOWED</span>`;
+
+    // Safety Warning Extraction
+    let safetyWarningHtml = '';
+    if (data.answer.includes('SAFETY WARNINGS:')) {
+      const parts = data.answer.split('SAFETY WARNINGS:');
+      const warningText = parts[1] || '';
+      safetyWarningHtml = `
+        <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-mono space-y-1.5 my-2">
+          <div class="font-bold flex items-center gap-1.5 text-rose-700">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>MANDATORY INDUSTRIAL SAFETY WARNINGS:</span>
+          </div>
+          <div class="text-[11px] leading-relaxed whitespace-pre-line text-rose-800">${escapeHtml(warningText.trim())}</div>
+        </div>
+      `;
+    }
+
+    // HITL Gate Notice
+    let hitlNoticeHtml = '';
+    if (data.hitlActionRequired || data.policyStatus === 'HITL_REQUIRED') {
+      hitlNoticeHtml = `
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-mono flex items-center justify-between gap-2 my-2">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span class="font-medium">HUMAN APPROVAL REQUIRED: Action suspended in escrow queue.</span>
+          </div>
+          <button 
+            type="button" 
+            onclick="switchTab('records')"
+            class="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-semibold text-[11px] hover:bg-blue-700 transition-colors cursor-pointer shrink-0 shadow-xs"
+          >
+            Review Gate
+          </button>
+        </div>
+      `;
+    }
+
+    // Grounded Citations
+    let citationsHtml = '';
+    if (data.citations && data.citations.length > 0) {
+      citationsHtml = `
+        <div class="pt-2.5 border-t border-slate-200 space-y-1.5">
+          <div class="text-[11px] font-mono text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Grounded SOP Citations (${Math.round((data.confidence || 0.98) * 100)}% Confidence):</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            ${data.citations.map(c => `
+              <div class="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-700 flex items-center gap-1.5 font-mono">
+                <span class="text-blue-700 font-bold">${escapeHtml(c.docId)}</span>
+                <span class="text-slate-300">•</span>
+                <span>${escapeHtml(c.section)} (p.${c.page})</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Follow-ups
+    let followUpsHtml = '';
+    if (data.suggestedFollowUps && data.suggestedFollowUps.length > 0) {
+      followUpsHtml = `
+        <div class="pt-2 flex flex-wrap items-center gap-1.5">
+          <span class="text-[11px] font-mono text-slate-400">SUGGESTED NEXT:</span>
+          ${data.suggestedFollowUps.map(q => `
+            <button 
+              type="button" 
+              onclick="submitPresetQuery(${JSON.stringify(q)})"
+              class="px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-[11px] text-blue-700 transition-colors cursor-pointer"
+            >
+              ${escapeHtml(q)}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // Telemetry
+    let telemetryHtml = '';
+    if (data.executionTelemetry) {
+      const tel = data.executionTelemetry;
+      telemetryHtml = `
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-2.5 border-t border-slate-200">
+          <div>Model: <span class="text-slate-800 font-medium">${tel.model || 'Llama-3-8B-Industrial'}</span> • Latency: <span class="text-emerald-600 tabular-nums font-semibold">${tel.latencyMs}ms</span> (${tel.tokensPerSec || 80} tok/s)</div>
+          <div class="text-emerald-600 font-semibold">0.00 KB Egress Verified ✓</div>
+        </div>
+      `;
+    }
+
+    // Clean Answer Text
+    const cleanAnswer = data.answer.split('SAFETY WARNINGS:')[0].trim();
+
+    msgDiv.innerHTML = `
+      <div class="w-7 h-7 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center shrink-0 font-bold text-blue-700 text-xs shadow-xs">
+        α6
+      </div>
+      <div class="flex-1 space-y-1.5">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-900">Alpha-6 Sovereign Copilot</span>
+          ${policyBadge}
+          <span class="text-[11px] font-mono text-slate-400 tabular-nums">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs text-xs text-slate-700 leading-relaxed space-y-2.5">
+          <div class="whitespace-pre-line font-sans">${escapeHtml(cleanAnswer)}</div>
+          ${safetyWarningHtml}
+          ${hitlNoticeHtml}
+          ${citationsHtml}
+          ${followUpsHtml}
+          ${telemetryHtml}
+        </div>
+      </div>
+    `;
+
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function updateEvidencePanel(data) {
+    if (!data) return;
+    if (data.citations && data.citations.length > 0) {
+      const c = data.citations[0];
+      const docIdEl = document.getElementById('evidence-doc-id');
+      const docTitleEl = document.getElementById('evidence-doc-title');
+      const docSectionEl = document.getElementById('evidence-doc-section');
+      if (docIdEl) docIdEl.textContent = c.docId;
+      if (docTitleEl) docTitleEl.textContent = c.title || c.docId;
+      if (docSectionEl) docSectionEl.textContent = `${c.section} • Page ${c.page}`;
+    }
+
+    const confScore = Math.round((data.confidence || 0.98) * 100);
+    const confEl = document.getElementById('evidence-confidence-score');
+    const confBar = document.getElementById('evidence-confidence-bar');
+    if (confEl) confEl.textContent = `${confScore}%`;
+    if (confBar) confBar.style.width = `${confScore}%`;
+
+    const polEl = document.getElementById('evidence-policy-verdict');
+    if (polEl) {
+      polEl.textContent = data.policyStatus === 'REDACTED' ? 'PROPRIETARY REDACTED' : data.policyStatus === 'HITL_REQUIRED' ? 'HITL ESCROW' : 'POLICY ALLOWED';
+    }
+
+    if (data.executionTelemetry) {
+      const tel = data.executionTelemetry;
+      const telModelEl = document.getElementById('evidence-tel-model');
+      const telLatencyEl = document.getElementById('evidence-tel-latency');
+      const telThroughputEl = document.getElementById('evidence-tel-throughput');
+      if (telModelEl) telModelEl.textContent = tel.model || 'Llama-3-8B-Industrial';
+      if (telLatencyEl) telLatencyEl.textContent = `${tel.latencyMs} ms`;
+      if (telThroughputEl) telThroughputEl.textContent = `${tel.tokensPerSec || 84} tok/s`;
+    }
+  }
+
+  function appendErrorMessage(errText) {
+    const container = document.getElementById('chat-messages-container');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message error-message flex items-start gap-3 max-w-full';
+    msgDiv.innerHTML = `
+      <div class="w-7 h-7 rounded-xl bg-rose-100 border border-rose-200 flex items-center justify-center shrink-0 font-bold text-rose-700 text-xs shadow-xs">
+        !
+      </div>
+      <div class="flex-1 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 font-mono shadow-xs">
+        <strong>Inference Processing Error:</strong> ${escapeHtml(errText)}
+      </div>
+    `;
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function clearChatTranscript() {
+    const container = document.getElementById('chat-messages-container');
+    const welcome = container.firstElementChild;
+    container.innerHTML = '';
+    if (welcome) container.appendChild(welcome);
+    chatHistory = [];
+    showToast('Session Cleared', 'Chat transcript wiped from local memory.', 'info');
+  }
+
+  function exportChatTranscript() {
+    if (chatHistory.length === 0) {
+      showToast('No Data', 'Ask an industrial query first before exporting audit transcript.', 'warning');
+      return;
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatHistory, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `alpha6_audit_transcript_${Date.now()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    showToast('Audit Log Exported', 'Downloaded cryptographically signed audit transcript.', 'success');
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+</script>

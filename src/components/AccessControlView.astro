@@ -1,0 +1,168 @@
+---
+// Role-Based Access Control (RBAC) & Purdue Security Credentials
+---
+
+<div id="view-access-control" class="app-view hidden space-y-4 animate-fadeIn">
+  <!-- Header -->
+  <div class="ui-panel p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          ACCESS CONTROL &amp; RBAC
+        </span>
+        <span class="text-xs text-slate-500 font-medium">Purdue Level 3 Authentication &amp; Permissions</span>
+      </div>
+      <h2 class="text-base sm:text-lg font-bold tracking-tight text-slate-900 mt-1">
+        Operator Personas &amp; Supervisory Sign-Off Authority
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Hierarchical access matrix enforcing segregation of duties across DCS operators, process engineers, and safety auditors.
+      </p>
+    </div>
+
+    <!-- Active Persona -->
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 shadow-2xs">
+        <span class="text-slate-400">ACTIVE SESSION:</span> <strong class="text-blue-700 font-semibold">K. Raman (Lead Process Eng)</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Permissions Matrix Table -->
+  <div class="ui-panel overflow-hidden">
+    <div class="p-3.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+      <span class="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-wider">Industrial RBAC Privilege Matrix</span>
+      <span class="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">IEC 62443 SECURITY LEVEL 3</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="bg-slate-50/50 border-b border-slate-200 text-[10px] font-mono uppercase text-slate-500">
+            <th class="py-3 px-4 font-semibold">Role / Designation</th>
+            <th class="py-3 px-4 font-semibold">Personnel</th>
+            <th class="py-3 px-4 text-center font-semibold">Copilot Q&amp;A</th>
+            <th class="py-3 px-4 text-center font-semibold">P&amp;ID Vision</th>
+            <th class="py-3 px-4 text-center font-semibold">HITL Sign-Off</th>
+            <th class="py-3 px-4 text-center font-semibold">Policy Edit</th>
+            <th class="py-3 px-4 text-center font-semibold">Audit Export</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-mono">
+          <tr class="bg-blue-50/30 hover:bg-blue-50/60 transition-colors">
+            <td class="py-3 px-4">
+              <div class="font-bold text-blue-700 font-sans text-xs">Lead Process Engineer</div>
+              <div class="text-[10px] text-slate-400">Supervisory Authority</div>
+            </td>
+            <td class="py-3 px-4 font-sans text-slate-900 font-semibold">K. Raman</td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">✓ (Primary)</span></td>
+            <td class="py-3 px-4 text-center text-slate-500 font-medium font-sans">Draft</td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+          </tr>
+
+          <tr class="hover:bg-slate-50/60 transition-colors">
+            <td class="py-3 px-4">
+              <div class="font-bold text-slate-800 font-sans text-xs">Shift DCS Operator</div>
+              <div class="text-[10px] text-slate-400">Console Monitoring</div>
+            </td>
+            <td class="py-3 px-4 font-sans text-slate-900 font-medium">V. Sharma</td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Escrow Only</span></td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-100 text-rose-600 text-xs font-bold">✗</span></td>
+            <td class="py-3 px-4 text-center text-slate-500 font-medium font-sans">Read</td>
+          </tr>
+
+          <tr class="hover:bg-slate-50/60 transition-colors">
+            <td class="py-3 px-4">
+              <div class="font-bold text-slate-800 font-sans text-xs">Chief Safety Auditor</div>
+              <div class="text-[10px] text-slate-400">Compliance Inspection</div>
+            </td>
+            <td class="py-3 px-4 font-sans text-slate-900 font-medium">N. Deshmukh</td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center text-slate-500 font-medium font-sans">Review</td>
+            <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ (Approve)</span></td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+          </tr>
+
+          <tr class="hover:bg-slate-50/60 transition-colors">
+            <td class="py-3 px-4">
+              <div class="font-bold text-slate-800 font-sans text-xs">Maintenance Lead</div>
+              <div class="text-[10px] text-slate-400">Mechanical &amp; LOTO</div>
+            </td>
+            <td class="py-3 px-4 font-sans text-slate-900 font-medium">R. Patel</td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">✓</span></td>
+            <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">LOTO Sign</span></td>
+            <td class="py-3 px-4 text-center"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-100 text-rose-600 text-xs font-bold">✗</span></td>
+            <td class="py-3 px-4 text-center text-slate-500 font-medium font-sans">Read</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Persona Switcher for Hackathon Demonstration -->
+  <div class="ui-panel p-5 space-y-3.5">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Active Persona Switcher (Presentation Simulation)</h3>
+      <span class="text-[10px] font-mono text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">SIH26117 DEMO GATEWAY</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <button 
+        type="button" 
+        onclick="switchOperatorPersona('K. Raman (Lead Process Eng)', 'Lead Process Engineer', 'KR')"
+        class="p-3.5 rounded-xl bg-blue-50/70 border-2 border-blue-600 text-left space-y-1 hover:bg-blue-50 transition-all cursor-pointer shadow-xs"
+      >
+        <div class="flex items-center justify-between text-[10px] font-mono">
+          <span class="text-blue-700 font-bold">SUPERVISOR</span>
+          <span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold">ACTIVE</span>
+        </div>
+        <div class="text-xs font-bold text-slate-900">K. Raman</div>
+        <div class="text-[11px] text-slate-500">Can authorize all HITL gates</div>
+      </button>
+
+      <button 
+        type="button" 
+        onclick="switchOperatorPersona('V. Sharma (Shift DCS Operator)', 'Shift DCS Operator', 'VS')"
+        class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-left space-y-1 hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
+      >
+        <div class="flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-600 font-semibold">OPERATOR</span>
+          <span class="text-slate-400 font-medium">SWITCH</span>
+        </div>
+        <div class="text-xs font-bold text-slate-900">V. Sharma</div>
+        <div class="text-[11px] text-slate-500">Console operator view</div>
+      </button>
+
+      <button 
+        type="button" 
+        onclick="switchOperatorPersona('N. Deshmukh (Chief Safety Auditor)', 'Chief Safety Auditor', 'ND')"
+        class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/90 text-left space-y-1 hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
+      >
+        <div class="flex items-center justify-between text-[10px] font-mono">
+          <span class="text-purple-700 font-semibold">AUDITOR</span>
+          <span class="text-slate-400 font-medium">SWITCH</span>
+        </div>
+        <div class="text-xs font-bold text-slate-900">N. Deshmukh</div>
+        <div class="text-[11px] text-slate-500">Safety compliance audit</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function switchOperatorPersona(name, role, initials) {
+    const navName = document.getElementById('nav-operator-name');
+    const navInitials = document.getElementById('nav-operator-initials');
+    const hitlInput = document.getElementById('hitl-approver-name');
+    if (navName) navName.textContent = name.split(' ')[0] + ' ' + name.split(' ')[1];
+    if (navInitials) navInitials.textContent = initials;
+    if (hitlInput) hitlInput.value = `${name}`;
+    showToast('Active Persona Updated', `Switched active operator persona to ${name}.`, 'success');
+  }
+</script>

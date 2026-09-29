@@ -1,0 +1,140 @@
+---
+import { INITIAL_ANALYTICS } from '../data/analyticsData';
+---
+
+<div id="view-audit" class="app-view hidden space-y-4 animate-fadeIn">
+  <!-- Audit Header -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          IMMUTABLE AUDIT TRAIL
+        </span>
+        <span class="text-xs text-slate-500">Cryptographic Verification Ledger</span>
+      </div>
+      <h2 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900 mt-1">
+        Cryptographic Operational Audit &amp; Sign-Off Ledger
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Append-only SHA-256 transaction chain recording every operator inquiry, model output, policy interception, and supervisory authorization.
+      </p>
+    </div>
+
+    <!-- Actions & Integrity Status -->
+    <div class="flex items-center gap-2.5">
+      <div class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-700 font-semibold flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>MERKLE CHAIN: 100% VERIFIED</span>
+      </div>
+      <button 
+        type="button" 
+        onclick="exportAuditLedger()"
+        class="btn-primary-blue text-xs py-2 px-4 shadow-xs"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span>Export Ledger (JSON)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter & Search Bar Card -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div class="flex items-center gap-2 flex-1 max-w-md">
+      <label for="audit-search-input" class="sr-only">Search Audit Ledger</label>
+      <input 
+        type="text" 
+        id="audit-search-input"
+        oninput="filterAuditLogsClientSide()"
+        placeholder="Filter by operator, hash, action, or tag..." 
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+      />
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label for="audit-verdict-select" class="text-xs font-semibold text-slate-500 uppercase tracking-wider font-mono">Verdict:</label>
+      <select 
+        id="audit-verdict-select" 
+        onchange="filterAuditLogsClientSide()"
+        class="bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+      >
+        <option value="ALL">All Verdicts</option>
+        <option value="ALLOW">ALLOW</option>
+        <option value="REDACTED">REDACTED</option>
+        <option value="FLAG_FOR_HITL">FLAG_FOR_HITL</option>
+        <option value="DENIED">DENIED</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Audit Table Card -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-semibold uppercase text-slate-500">
+            <th class="py-3 px-4">Timestamp (UTC)</th>
+            <th class="py-3 px-4">Operator / Persona</th>
+            <th class="py-3 px-4">Unit</th>
+            <th class="py-3 px-4">Operational Action / Query</th>
+            <th class="py-3 px-4">Model</th>
+            <th class="py-3 px-4">Policy Verdict</th>
+            <th class="py-3 px-4">Latency</th>
+            <th class="py-3 px-4 text-right">Cryptographic Hash</th>
+          </tr>
+        </thead>
+        <tbody id="audit-table-body" class="divide-y divide-slate-100 font-mono">
+          {INITIAL_ANALYTICS.auditLogs.map((log) => {
+            const verdictBadge = log.policyVerdict === 'ALLOW'
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+              : log.policyVerdict === 'REDACTED'
+              ? "bg-amber-50 text-amber-700 border-amber-200"
+              : log.policyVerdict === 'FLAG_FOR_HITL'
+              ? "bg-rose-50 text-rose-700 border-rose-200 font-bold"
+              : "bg-rose-50 text-rose-700 border-rose-200";
+
+            return (
+              <tr class="audit-row hover:bg-slate-50/80 transition-colors" data-verdict={log.policyVerdict} data-text={`${log.operator} ${log.action} ${log.hash} ${log.unit}`.toLowerCase()}>
+                <td class="py-3 px-4 text-slate-500 tabular-nums whitespace-nowrap">{log.timestamp}</td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <div class="text-slate-900 font-sans font-bold">{log.operator}</div>
+                  <div class="text-[11px] text-slate-500 font-sans">{log.role}</div>
+                </td>
+                <td class="py-3 px-4 text-blue-700 font-semibold whitespace-nowrap">{log.unit}</td>
+                <td class="py-3 px-4 font-sans text-slate-800 max-w-sm truncate">{log.action}</td>
+                <td class="py-3 px-4 text-slate-600 whitespace-nowrap">{log.model}</td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${verdictBadge}`}>
+                    {log.policyVerdict}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-emerald-600 tabular-nums font-semibold whitespace-nowrap">{log.latencyMs}ms</td>
+                <td class="py-3 px-4 text-right text-slate-400 text-xs truncate max-w-[120px] whitespace-nowrap">{log.hash}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function filterAuditLogsClientSide() {
+    const search = (document.getElementById('audit-search-input')?.value || '').toLowerCase().trim();
+    const verdict = document.getElementById('audit-verdict-select')?.value || 'ALL';
+
+    const rows = document.querySelectorAll('.audit-row');
+    rows.forEach(r => {
+      const rowVerdict = r.getAttribute('data-verdict');
+      const rowText = r.getAttribute('data-text') || '';
+
+      const matchSearch = !search || rowText.includes(search);
+      const matchVerdict = verdict === 'ALL' || rowVerdict === verdict;
+
+      if (matchSearch && matchVerdict) r.classList.remove('hidden');
+      else r.classList.add('hidden');
+    });
+  }
+</script>

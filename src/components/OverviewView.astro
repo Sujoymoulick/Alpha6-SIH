@@ -1,0 +1,537 @@
+---
+import { INITIAL_RECORDS } from '../data/sampleRecords';
+---
+
+<div id="view-overview" class="app-view space-y-6 animate-fadeIn">
+  <!-- 1. GREETING & LIVE TIME HEADER (Matching Reference Screenshot) -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-sans">
+        Good afternoon, K. Raman!
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium flex items-center gap-2">
+        <span>You have <strong class="text-blue-600 font-bold" id="header-pending-count">2 tasks pending</strong>.</span>
+        <span class="text-slate-300">•</span>
+        <button 
+          type="button" 
+          onclick="switchTab('records')" 
+          class="text-blue-600 hover:text-blue-800 hover:underline font-semibold cursor-pointer"
+        >
+          Review queue →
+        </button>
+      </p>
+    </div>
+
+    <!-- Right: Current Time & Badge (Matching Screenshot) -->
+    <div class="flex items-center gap-3">
+      <div class="text-right">
+        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Current time</div>
+        <div class="text-xl sm:text-2xl font-extrabold text-slate-900 tabular-nums font-sans" id="live-overview-clock">
+          12:10 PM
+        </div>
+      </div>
+      <div class="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-600 shadow-xs" title="Purdue Level 3 Air-Gapped Console">
+        <svg class="w-5 h-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. TOP METRICS STRIP: 3 MODULAR CARDS (Matching Reference Screenshot) -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+    
+    <!-- CARD 1 (cols 4): Live Elevator Status Style -> "Live Plant & Pump Status" -->
+    <div class="md:col-span-4 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-4">
+      <!-- Card Header -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-slate-900 tracking-tight">Live Equipment Status</h2>
+        <span class="px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500 text-white shadow-xs">
+          Operational
+        </span>
+      </div>
+
+      <div class="text-[11px] font-medium text-slate-400">
+        In the next 15 minutes / Current Shift
+      </div>
+
+      <!-- Center Metrics Split (Bullets + Donut Chart) -->
+      <div class="flex items-center justify-between gap-3">
+        <!-- Bullets -->
+        <div class="space-y-2 text-xs text-slate-700 font-medium">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+            </svg>
+            <span><strong class="text-slate-900 font-semibold">8/16 pumps</strong> active (P-204 ready)</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+            <span><strong class="text-slate-900 font-semibold">2 units</strong> flagged (ST-401 bearing)</span>
+          </div>
+        </div>
+
+        <!-- Donut Chart (Matching "22 Live status") -->
+        <div class="relative w-20 h-20 shrink-0 flex items-center justify-center">
+          <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+            <path
+              class="text-slate-100"
+              stroke-width="3.5"
+              stroke="currentColor"
+              fill="none"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <path
+              class="text-blue-600"
+              stroke-dasharray="82, 100"
+              stroke-width="3.5"
+              stroke-linecap="round"
+              stroke="currentColor"
+              fill="none"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span class="text-lg font-extrabold text-slate-900 leading-none">22</span>
+            <span class="text-[9px] text-slate-400 font-medium mt-0.5">Live status</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Highlight with blue bar (Matching Screenshot) -->
+      <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
+        <div class="w-1 h-7 rounded-full bg-blue-600 shrink-0"></div>
+        <div class="text-xs text-slate-600 font-medium leading-snug">
+          More than half the space is occupied • Plan 53A active
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2 (cols 5): Elevator Slot Booked Style -> "Operational Inferences Histogram" -->
+    <div class="md:col-span-5 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-3">
+      <!-- Header with "Today" pill selector -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-slate-900 tracking-tight">Inference &amp; Telemetry Stream</h2>
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700">
+          <span>Today</span>
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="flex items-center gap-3 text-[11px] font-medium text-slate-500">
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Normal (vLLM)</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+          <span>Over Capacity</span>
+        </div>
+      </div>
+
+      <!-- Subheader: Usually not too busy -->
+      <div class="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
+        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+        <span>Live: Usually not too busy (~412ms latency)</span>
+      </div>
+
+      <!-- Bar Chart (Matching Screenshot with 12p, 1p, 2p and Tooltip on 2pm) -->
+      <div class="relative pt-4 pb-1">
+        <!-- Floating Tooltip on 2pm bar -->
+        <div class="absolute -top-1 right-8 bg-slate-900 text-white rounded-lg px-2 py-0.5 text-[10px] font-mono shadow-md flex items-center gap-1 z-10">
+          <span>2pm</span>
+          <span class="text-rose-400">• 31</span>
+        </div>
+
+        <!-- Vertical bars container -->
+        <div class="h-24 flex items-end justify-between gap-1.5 px-2 border-b border-slate-100">
+          <!-- 12p bucket -->
+          <div class="flex items-end gap-1">
+            <div class="w-1.5 h-6 rounded-t bg-blue-500"></div>
+            <div class="w-1.5 h-10 rounded-t bg-amber-500"></div>
+            <div class="w-1.5 h-9 rounded-t bg-blue-500"></div>
+          </div>
+
+          <!-- 1p bucket -->
+          <div class="flex items-end gap-1">
+            <div class="w-1.5 h-7 rounded-t bg-blue-500"></div>
+            <div class="w-1.5 h-14 rounded-t bg-blue-500"></div>
+            <div class="w-1.5 h-11 rounded-t bg-blue-500"></div>
+            <div class="w-1.5 h-16 rounded-t bg-blue-500"></div>
+          </div>
+
+          <!-- 2p bucket (peaking) -->
+          <div class="flex items-end gap-1">
+            <div class="w-1.5 h-18 rounded-t bg-blue-500"></div>
+            <div class="w-1.5 h-20 rounded-t bg-blue-500"></div>
+            <div class="w-1.5 h-22 rounded-t bg-blue-600"></div>
+            <div class="w-1.5 h-24 rounded-t bg-blue-600"></div>
+            <div class="w-1.5 h-19 rounded-t bg-blue-500"></div>
+            <div class="w-1.5 h-17 rounded-t bg-blue-500"></div>
+          </div>
+        </div>
+
+        <!-- X-axis labels -->
+        <div class="flex items-center justify-between text-[10px] font-medium text-slate-400 px-3 pt-1">
+          <span>12p</span>
+          <span>1p</span>
+          <span>2p</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3 (cols 3): Lunch Time / Rush Hour Style -> "Supervisory Escrow Alert" -->
+    <div class="md:col-span-3 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-4">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-slate-900 tracking-tight">Supervisory Escrow</h2>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500 text-white shadow-xs">
+          2 Pending
+        </span>
+      </div>
+
+      <!-- Icon cluster (Machinery / Steam icons) -->
+      <div class="flex items-center gap-2 text-blue-600">
+        <div class="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Headline & Subtitle (Matching "Rush hour! You haven't booked your lunch slot!") -->
+      <div>
+        <h3 class="text-lg font-bold text-slate-900 leading-snug">Turbine Alert!</h3>
+        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+          ST-401 vibration hit 7.6 mm/s. Supervisory approval required!
+        </p>
+      </div>
+
+      <!-- Full-Width Vibrant Blue Primary Button (Matching "Book Now") -->
+      <button 
+        type="button" 
+        onclick="openHitlApprovalModal('rec-003')"
+        class="w-full btn-primary-blue py-2.5 shadow-sm text-xs font-semibold"
+      >
+        <span>Review &amp; Authorize</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. BOTTOM SECTION: WIDE TABLE CARD + RIGHT ACTION PROMO CARDS (Matching Reference Screenshot) -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    
+    <!-- LEFT WIDE CARD (cols 8): Meeting Rooms Style -> "Plant Records & SOP Matrix" -->
+    <div class="lg:col-span-8 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-4">
+      
+      <!-- Top header with Search input -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h2 class="text-base font-bold text-slate-900 tracking-tight">Plant Records &amp; SOP Documents</h2>
+        
+        <!-- Search rooms style input -->
+        <div class="relative w-full sm:w-64">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input 
+            type="text" 
+            id="overview-table-search"
+            oninput="filterOverviewTable(this.value)"
+            placeholder="Search records, tags, SOPs..." 
+            class="w-full bg-slate-50 hover:bg-slate-100/60 focus:bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all"
+          />
+        </div>
+      </div>
+
+      <!-- Filter Dropdown Strip (Floors*, Max Capacity*, Date*, Time*) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-1">
+        <!-- Filter 1: Plant Unit (Floors) -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Plant Unit <span class="text-rose-500">*</span></label>
+          <div class="relative">
+            <select 
+              id="overview-filter-unit"
+              onchange="filterOverviewTableByDropdowns()"
+              class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 font-medium appearance-none focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="ALL">All Units</option>
+              <option value="CDU-1">CDU-1 (Crude)</option>
+              <option value="HCU-3">HCU-3 (Hydrocracker)</option>
+              <option value="Utilities">Utilities &amp; Turbines</option>
+              <option value="FCCU-2">FCCU-2 (Catalytic)</option>
+              <option value="SRU-2">SRU-2 (Sulfur)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter 2: Category (Max Capacity) -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Category <span class="text-rose-500">*</span></label>
+          <div class="relative">
+            <select 
+              id="overview-filter-cat"
+              onchange="filterOverviewTableByDropdowns()"
+              class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 font-medium appearance-none focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="ALL">All Categories</option>
+              <option value="SOP">SOP Verification</option>
+              <option value="P&ID">P&amp;ID Drawing</option>
+              <option value="Telemetry / Alarm">Telemetry / Alarm</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter 3: Date (Date*) -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Date <span class="text-rose-500">*</span></label>
+          <div class="relative flex items-center">
+            <input 
+              type="text" 
+              readonly 
+              value="Sept 30, 2026" 
+              class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 font-medium focus:outline-none cursor-default"
+            />
+            <svg class="w-4 h-4 text-slate-400 absolute right-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Filter 4: Shift Time (Time*) -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Shift Time <span class="text-rose-500">*</span></label>
+          <div class="relative flex items-center">
+            <input 
+              type="text" 
+              readonly 
+              value="08:00 - 16:00" 
+              class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 font-medium focus:outline-none cursor-default"
+            />
+            <svg class="w-4 h-4 text-slate-400 absolute right-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real Table Layout (Room Details, Floor, Screen, Capacity, Action) -->
+      <div class="overflow-x-auto pt-1">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-y border-slate-100 text-[11px] font-semibold text-slate-500">
+              <th class="py-2.5 px-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-3.5 h-3.5 rounded-full border border-slate-300 inline-block"></span>
+                  <span>Record Details</span>
+                  <span class="text-slate-400">⇅</span>
+                </div>
+              </th>
+              <th class="py-2.5 px-3">
+                <div class="flex items-center gap-1">
+                  <span>Plant Unit</span>
+                  <span class="text-slate-400">⇅</span>
+                </div>
+              </th>
+              <th class="py-2.5 px-3">
+                <div class="flex items-center gap-1">
+                  <span>Source SOP</span>
+                  <span class="text-slate-400">⇅</span>
+                </div>
+              </th>
+              <th class="py-2.5 px-3">
+                <div class="flex items-center gap-1">
+                  <span>Confidence</span>
+                  <span class="text-slate-400">⇅</span>
+                </div>
+              </th>
+              <th class="py-2.5 px-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="overview-table-body" class="divide-y divide-slate-100">
+            {INITIAL_RECORDS.slice(0, 4).map((rec, index) => {
+              const isPending = rec.status === 'Pending Approval';
+              return (
+                <tr class="overview-table-row hover:bg-slate-50/80 transition-colors" data-unit={rec.plantUnit} data-cat={rec.category} data-text={`${rec.title} ${rec.recordNumber}`.toLowerCase()}>
+                  <!-- Checkbox + Number badge + Title -->
+                  <td class="py-3 px-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center shrink-0 cursor-pointer"></span>
+                      <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-500 font-semibold text-[10px] flex items-center justify-center shrink-0">
+                        {index + 1}
+                      </span>
+                      <div class="min-w-0">
+                        <div class="font-bold text-slate-900 text-xs truncate">{rec.recordNumber}</div>
+                        <div class="text-[11px] text-slate-500 truncate font-medium">{rec.title}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Floor / Unit -->
+                  <td class="py-3 px-3 text-slate-600 font-medium whitespace-nowrap">
+                    {rec.plantUnit}
+                  </td>
+
+                  <!-- Screen / SOP -->
+                  <td class="py-3 px-3 text-slate-600 whitespace-nowrap font-mono text-[11px]">
+                    {rec.details?.citations?.[0]?.document || 'SOP-Standard'}
+                  </td>
+
+                  <!-- Capacity / Confidence -->
+                  <td class="py-3 px-3 font-semibold text-slate-900 tabular-nums whitespace-nowrap">
+                    {Math.round(rec.confidenceScore * 100)}%
+                  </td>
+
+                  <!-- Action (Book Style Button) -->
+                  <td class="py-3 px-3 text-right whitespace-nowrap">
+                    {isPending ? (
+                      <button 
+                        type="button" 
+                        onclick={`openHitlApprovalModal(${JSON.stringify(rec.id)})`}
+                        class="px-3.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors cursor-pointer"
+                      >
+                        Authorize
+                      </button>
+                    ) : (
+                      <button 
+                        type="button" 
+                        onclick={`inspectRecordById(${JSON.stringify(rec.id)})`}
+                        class="px-3 py-1 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-xs transition-colors cursor-pointer"
+                      >
+                        Inspect
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIGHT PROMO CARDS (cols 4): Matching "Use Stairs. Win Rewards." & bottom card -->
+    <div class="lg:col-span-4 space-y-4 flex flex-col justify-between">
+      
+      <!-- Card A: Use Stairs Style -> "Sovereign Air-Gap. Zero Egress." -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-3 flex-1 flex flex-col justify-between">
+        <div>
+          <!-- Runner / Shield Icons -->
+          <div class="flex items-center gap-1.5 text-blue-600 mb-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+
+          <h3 class="text-lg font-bold text-slate-900 leading-snug">
+            Sovereign Air-Gap.<br />Zero Egress.
+          </h3>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed font-normal">
+            Purdue Level 3 boundary active. eBPF packet filter verified 0.00 KB outbound WAN egress. All models execute locally.
+          </p>
+        </div>
+
+        <!-- Action Button (Matching "Link your Fitness App!") -->
+        <button 
+          type="button" 
+          onclick="switchTab('audit')"
+          class="w-full py-2.5 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+        >
+          <span>Verify Merkle Audit Chain →</span>
+        </button>
+      </div>
+
+      <!-- Card B: Multimodal Vision Blueprint Card -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs space-y-2.5">
+        <div class="flex items-center gap-2 text-blue-600">
+          <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-900 leading-tight">Multimodal P&amp;ID Vision</div>
+            <div class="text-[10px] text-slate-400">DWG-CDU-401 Sheet 2</div>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 leading-snug">
+          Relief valve PSV-2041 setpoint verified at 4.80 barg. Capacity 185,000 kg/hr hydrocarbon vapor.
+        </p>
+        <button 
+          type="button" 
+          onclick="switchTab('workflow')"
+          class="w-full py-1.5 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium text-xs transition-colors cursor-pointer text-center"
+        >
+          Open Agent Studio →
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function filterOverviewTable(query) {
+    const q = (query || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('.overview-table-row');
+    rows.forEach(r => {
+      const text = r.getAttribute('data-text') || '';
+      if (!q || text.includes(q)) {
+        r.classList.remove('hidden');
+      } else {
+        r.classList.add('hidden');
+      }
+    });
+  }
+
+  function filterOverviewTableByDropdowns() {
+    const unit = document.getElementById('overview-filter-unit')?.value || 'ALL';
+    const cat = document.getElementById('overview-filter-cat')?.value || 'ALL';
+    const rows = document.querySelectorAll('.overview-table-row');
+
+    rows.forEach(r => {
+      const rUnit = r.getAttribute('data-unit');
+      const rCat = r.getAttribute('data-cat');
+      const matchUnit = unit === 'ALL' || rUnit === unit;
+      const matchCat = cat === 'ALL' || rCat === cat;
+
+      if (matchUnit && matchCat) {
+        r.classList.remove('hidden');
+      } else {
+        r.classList.add('hidden');
+      }
+    });
+  }
+
+  function updateOverviewLiveClock() {
+    const clock = document.getElementById('live-overview-clock');
+    if (!clock) return;
+    const now = new Date();
+    clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  setInterval(updateOverviewLiveClock, 1000);
+  updateOverviewLiveClock();
+</script>

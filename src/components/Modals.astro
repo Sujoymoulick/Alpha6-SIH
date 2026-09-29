@@ -1,0 +1,613 @@
+---
+// Interactive Modals: HITL Digital Sign-Off, Document Drawer, Record Inspector, Notifications, Shortcuts
+---
+
+<!-- 1. HITL Digital Sign-Off Approval Modal -->
+<div 
+  id="modal-hitl" 
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="hitl-modal-title"
+>
+  <div class="relative w-full max-w-lg bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-6 space-y-4">
+    <!-- Modal Header -->
+    <div class="flex items-start justify-between border-b border-slate-100 pb-3.5">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 font-bold shadow-2xs">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
+            HUMAN-IN-THE-LOOP MANDATE
+          </span>
+          <h3 id="hitl-modal-title" class="text-base font-bold text-slate-900 mt-1">
+            Authorize Supervisory Operational Action
+          </h3>
+        </div>
+      </div>
+
+      <button 
+        type="button" 
+        onclick="closeModal('modal-hitl')" 
+        class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1.5 rounded-lg transition-colors cursor-pointer"
+        aria-label="Close dialog"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body Content -->
+    <div class="space-y-3.5 text-xs">
+      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+        <div class="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+          <span>Target Record: <strong class="text-blue-700 font-bold" id="hitl-modal-recnum">REC-2026-TURB-003</strong></span>
+          <span class="font-semibold text-slate-700" id="hitl-modal-unit">Utilities</span>
+        </div>
+        <div class="font-bold text-slate-900 text-sm mt-0.5" id="hitl-modal-title-text">
+          Steam Turbine ST-401 Governor Valve Throttle
+        </div>
+      </div>
+
+      <!-- Proposed Command -->
+      <div class="space-y-1.5">
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Proposed Operational Command:</span>
+        <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200 font-mono text-amber-900 text-xs leading-relaxed" id="hitl-modal-command">
+          Throttle Main Steam Governor Valve MSV-401 by 15% and switch lube oil filter duplex valve to Bank B to mitigate bearing oil whip.
+        </div>
+      </div>
+
+      <!-- Safety Impact Assessment -->
+      <div class="space-y-1.5">
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Safety Impact Assessment:</span>
+        <p class="text-slate-600 leading-relaxed text-xs" id="hitl-modal-impact">
+          Reduces turbine output by 1.8 MW for 15 minutes. Prevents trip of main cooling water circulation pumps. Zero hazard to personnel.
+        </p>
+      </div>
+
+      <!-- Approver Name / Digital Signature -->
+      <div class="space-y-1.5 pt-1">
+        <label for="hitl-approver-name" class="block text-slate-700 font-bold text-xs font-mono">
+          Digital Authorization Signature:
+        </label>
+        <input 
+          type="text" 
+          id="hitl-approver-name" 
+          value="K. Raman (Lead Process Eng)" 
+          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-mono shadow-2xs"
+        />
+      </div>
+    </div>
+
+    <!-- Modal Footer Actions -->
+    <div class="flex items-center justify-end gap-2.5 pt-3.5 border-t border-slate-100">
+      <button 
+        type="button" 
+        id="btn-hitl-reject"
+        onclick="confirmHitlReject()"
+        class="px-4 py-2 rounded-xl text-xs font-semibold text-rose-700 hover:bg-rose-100 bg-rose-50 border border-rose-200 transition-colors cursor-pointer"
+      >
+        Reject Action
+      </button>
+
+      <button 
+        type="button" 
+        id="btn-hitl-approve"
+        onclick="confirmHitlApprove()"
+        class="btn-primary-blue py-2 px-5 text-xs font-bold rounded-xl shadow-xs"
+      >
+        Authorize &amp; Dispatch to DCS
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Detailed Record Inspector Modal -->
+<div 
+  id="modal-record-detail" 
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="rec-detail-title"
+>
+  <div class="relative w-full max-w-xl bg-white rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between border-b border-slate-100 pb-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-blue-700 font-bold text-xs" id="rec-detail-num">REC-2026-HCU-001</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200" id="rec-detail-unit">HCU-3</span>
+        </div>
+        <h3 id="rec-detail-title" class="text-base font-bold text-slate-900 mt-1">
+          Record Technical Specifications
+        </h3>
+      </div>
+      <button 
+        type="button" 
+        onclick="closeModal('modal-record-detail')" 
+        class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1.5 rounded-lg transition-colors cursor-pointer"
+        aria-label="Close dialog"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-3.5 text-xs">
+      <div>
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Summary</span>
+        <p class="text-slate-700 mt-1 leading-relaxed" id="rec-detail-summary"></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono">
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">EQUIPMENT TAGS:</span>
+          <div class="font-mono text-slate-900 mt-0.5 font-semibold" id="rec-detail-tags">N/A</div>
+        </div>
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">CRITICALITY:</span>
+          <div class="font-bold text-amber-700 mt-0.5" id="rec-detail-criticality">HIGH</div>
+        </div>
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">MODEL USED:</span>
+          <div class="text-slate-700 mt-0.5 font-sans" id="rec-detail-model">Llama-3-8B-Industrial</div>
+        </div>
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">AUDIT HASH:</span>
+          <div class="font-mono text-blue-700 mt-0.5 truncate" id="rec-detail-hash">sha256-...</div>
+        </div>
+      </div>
+
+      <div>
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Technical Notes &amp; Verification</span>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed font-mono text-[11px] mt-1 whitespace-pre-line" id="rec-detail-notes"></div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-100">
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Authoritative Citations</span>
+        <div class="space-y-2 mt-2" id="rec-detail-citations"></div>
+      </div>
+    </div>
+
+    <div class="pt-3 border-t border-slate-100 flex justify-end">
+      <button 
+        type="button" 
+        onclick="closeModal('modal-record-detail')" 
+        class="btn-secondary-light text-xs py-2 px-4 rounded-xl"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Knowledge Vault Document Detail Drawer / Modal -->
+<div 
+  id="modal-vault-detail" 
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="vault-detail-title"
+>
+  <div class="relative w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between border-b border-slate-100 pb-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-blue-700 font-bold text-xs" id="vault-modal-num">SOP-PMP-204-OPS</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold" id="vault-modal-status">INDEXED</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-50 text-amber-800 border border-amber-200 font-bold" id="vault-modal-class">CONFIDENTIAL</span>
+        </div>
+        <h3 id="vault-modal-title" class="text-base font-bold text-slate-900 mt-1">
+          Document Technical Manifest
+        </h3>
+      </div>
+      <button 
+        type="button" 
+        onclick="closeModal('modal-vault-detail')" 
+        class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1.5 rounded-lg transition-colors cursor-pointer"
+        aria-label="Close dialog"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-3.5 text-xs">
+      <div>
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Description &amp; Operational Scope</span>
+        <p class="text-slate-700 mt-1 leading-relaxed" id="vault-modal-desc"></p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 font-mono text-[11px]">
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">PAGES / CHUNKS:</span>
+          <div class="text-slate-900 mt-0.5 tabular-nums font-semibold" id="vault-modal-pages">24 pgs / 142 vectors</div>
+        </div>
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">UNIT:</span>
+          <div class="text-blue-700 mt-0.5 font-semibold" id="vault-modal-unit">CDU-1</div>
+        </div>
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">EMBEDDING MODEL:</span>
+          <div class="text-slate-700 mt-0.5 truncate" id="vault-modal-model">bge-large-en</div>
+        </div>
+        <div>
+          <span class="text-slate-400 text-[10px] font-bold">RETRIEVAL SCORE:</span>
+          <div class="text-emerald-700 font-bold mt-0.5 tabular-nums" id="vault-modal-score">0.994</div>
+        </div>
+      </div>
+
+      <div>
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Verified Source Excerpt</span>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 leading-relaxed font-mono text-[11px] mt-1 whitespace-pre-line" id="vault-modal-excerpt"></div>
+      </div>
+
+      <div class="space-y-1.5">
+        <span class="text-slate-500 uppercase text-[10px] font-mono font-bold tracking-wider">Associated Equipment Tags</span>
+        <div class="flex flex-wrap gap-1.5 mt-1" id="vault-modal-tags"></div>
+      </div>
+
+      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[10px] font-mono text-slate-500 space-y-1">
+        <div>CHECKSUM (SHA-256): <span class="text-slate-700 font-semibold truncate" id="vault-modal-hash"></span></div>
+        <div>SOURCE REFERENCE: <span class="text-slate-700 font-semibold" id="vault-modal-source"></span></div>
+      </div>
+    </div>
+
+    <div class="pt-3.5 border-t border-slate-100 flex items-center justify-between">
+      <button 
+        type="button" 
+        id="btn-vault-query-copilot"
+        class="btn-primary-blue text-xs py-2 px-4 rounded-xl shadow-xs font-semibold"
+      >
+        <span>Query This SOP in Copilot</span>
+      </button>
+
+      <button 
+        type="button" 
+        onclick="closeModal('modal-vault-detail')" 
+        class="btn-secondary-light text-xs py-2 px-4 rounded-xl"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Interactive Notifications Panel Flyout -->
+<div 
+  id="flyout-notifications" 
+  class="fixed top-16 right-6 z-50 hidden w-80 sm:w-96 bg-white rounded-2xl p-4 space-y-3 shadow-2xl border border-slate-200 animate-fadeIn"
+  role="dialog"
+  aria-label="Notifications"
+>
+  <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 text-xs">
+    <div class="flex items-center gap-2">
+      <span class="font-bold text-slate-900 text-sm">System Notifications</span>
+      <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200" id="flyout-badge-count">3</span>
+    </div>
+    <button 
+      type="button" 
+      onclick="markAllNotificationsRead()" 
+      class="text-[11px] font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+    >
+      Mark all read
+    </button>
+  </div>
+
+  <div class="space-y-2 text-xs" id="notifications-items-list">
+    <!-- Notification 1: HITL Gate Pending -->
+    <div class="p-3 rounded-xl bg-amber-50/50 border border-amber-200/80 space-y-1 shadow-2xs">
+      <div class="flex items-center justify-between text-[10px] font-mono">
+        <span class="text-amber-800 font-bold">HITL SUPERVISORY GATE</span>
+        <span class="text-slate-400">1m ago</span>
+      </div>
+      <div class="text-slate-900 font-bold text-xs">Steam Turbine ST-401 Governor Valve Throttle</div>
+      <div class="text-[11px] text-slate-600">Bearing 1 vibration 7.6 mm/s. Supervisory sign-off required.</div>
+      <button 
+        type="button" 
+        onclick="closeModal('flyout-notifications'); openHitlApprovalModal('rec-003');"
+        class="text-[11px] font-bold text-blue-600 hover:underline pt-0.5 inline-block cursor-pointer"
+      >
+        Review &amp; Authorize →
+      </button>
+    </div>
+
+    <!-- Notification 2: Policy Interception -->
+    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 shadow-2xs">
+      <div class="flex items-center justify-between text-[10px] font-mono">
+        <span class="text-blue-700 font-bold">POLICY GATE MASK</span>
+        <span class="text-slate-400">12m ago</span>
+      </div>
+      <div class="text-slate-900 font-bold text-xs">Proprietary Catalyst Recipe Redacted</div>
+      <div class="text-[11px] text-slate-600">Rule #POL-402 masked Zeolite Pt-Re formulations from prompt serialization.</div>
+    </div>
+
+    <!-- Notification 3: Document Indexed -->
+    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 shadow-2xs">
+      <div class="flex items-center justify-between text-[10px] font-mono">
+        <span class="text-emerald-700 font-bold">VECTOR STORE SYNC</span>
+        <span class="text-slate-400">45m ago</span>
+      </div>
+      <div class="text-slate-900 font-bold text-xs">SOP-PMP-204-OPS Indexed Successfully</div>
+      <div class="text-[11px] text-slate-600">142 vector chunks embedded into Qdrant spatial collection.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. Keyboard Shortcuts Modal -->
+<div 
+  id="modal-shortcuts" 
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="shortcuts-title"
+>
+  <div class="relative w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-2xl p-5 space-y-3.5">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+      <h3 id="shortcuts-title" class="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono">
+        Keyboard Shortcuts
+      </h3>
+      <button 
+        type="button" 
+        onclick="closeModal('modal-shortcuts')" 
+        class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1 rounded-lg transition-colors cursor-pointer"
+        aria-label="Close dialog"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-1.5 text-xs font-mono">
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Overview</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">1</kbd>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Plant Copilot</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">2</kbd>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Agent Studio</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">3</kbd>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Knowledge Vault</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">4</kbd>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Operational Records</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">5</kbd>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Telemetry</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">6</kbd>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Focus Chat Input</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">/</kbd>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        <span class="text-slate-700 font-medium">Close Dialogs</span>
+        <kbd class="px-2 py-0.5 rounded-md bg-white border border-slate-300 text-blue-700 font-bold font-mono text-[11px] shadow-2xs">Esc</kbd>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  let activeHitlRecordId = null;
+
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  }
+
+  function toggleNotifications() {
+    const el = document.getElementById('flyout-notifications');
+    if (el) el.classList.toggle('hidden');
+  }
+
+  function markAllNotificationsRead() {
+    const badge = document.getElementById('top-bell-badge');
+    const flyoutBadge = document.getElementById('flyout-badge-count');
+    if (badge) badge.classList.add('hidden');
+    if (flyoutBadge) flyoutBadge.textContent = '0';
+    showToast('Notifications Read', 'All alerts marked as acknowledged.', 'info');
+  }
+
+  function showKeyboardShortcutsModal() {
+    document.getElementById('modal-shortcuts')?.classList.remove('hidden');
+  }
+
+  function openHitlApprovalModal(recId) {
+    activeHitlRecordId = recId;
+    const rec = (cachedRecords || []).find(r => r.id === recId);
+    if (rec) {
+      document.getElementById('hitl-modal-recnum').textContent = rec.recordNumber;
+      document.getElementById('hitl-modal-unit').textContent = rec.plantUnit;
+      document.getElementById('hitl-modal-title-text').textContent = rec.title;
+      document.getElementById('hitl-modal-command').textContent = rec.details?.hitlActionDescription || rec.summary;
+      document.getElementById('hitl-modal-impact').textContent = rec.details?.hitlImpactAssessment || 'Safety verified under SIL-2 constraints.';
+    } else if (recId === 'rec-003') {
+      document.getElementById('hitl-modal-recnum').textContent = 'REC-2026-TURB-003';
+      document.getElementById('hitl-modal-unit').textContent = 'Utilities';
+      document.getElementById('hitl-modal-title-text').textContent = 'Steam Turbine ST-401 Governor Valve Throttle';
+      document.getElementById('hitl-modal-command').textContent = 'Throttle Main Steam Governor Valve MSV-401 by 15% and switch lube oil filter duplex valve to Bank B to mitigate bearing oil whip.';
+      document.getElementById('hitl-modal-impact').textContent = 'Reduces turbine output by 1.8 MW for 15 minutes. Prevents trip of main cooling water circulation pumps. Zero hazard to personnel.';
+    } else if (recId === 'rec-006') {
+      document.getElementById('hitl-modal-recnum').textContent = 'REC-2026-MNT-006';
+      document.getElementById('hitl-modal-unit').textContent = 'Utilities';
+      document.getElementById('hitl-modal-title-text').textContent = 'Pump P-102B Mechanical Seal Isolation';
+      document.getElementById('hitl-modal-command').textContent = 'Approve SAP Maintenance Work Order #WO-88401 and authorize LOTO electrical isolation permit for Pump P-102B 75kW motor.';
+      document.getElementById('hitl-modal-impact').textContent = 'Standby pump remains available; main cooling header pressure sustained by P-102A. Zero plant interruption.';
+    }
+    document.getElementById('modal-hitl')?.classList.remove('hidden');
+  }
+
+  async function confirmHitlApprove() {
+    if (!activeHitlRecordId) return;
+    const approver = document.getElementById('hitl-approver-name')?.value.trim() || 'K. Raman (Lead Process Eng)';
+    try {
+      const res = await fetch('/api/records', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'approve',
+          recordId: activeHitlRecordId,
+          approverName: approver
+        })
+      });
+      const data = await res.json();
+      closeModal('modal-hitl');
+      showToast('HITL Approved', data.message || 'Supervisory action dispatched to DCS bridge.', 'success');
+      if (typeof loadRecordsData === 'function') loadRecordsData();
+      if (typeof loadAnalyticsData === 'function') loadAnalyticsData();
+
+      // Update counters in top bar & KPI strip
+      const hitlBadge = document.getElementById('header-hitl-badge');
+      if (hitlBadge) hitlBadge.textContent = 'HITL: 1 Pending';
+      const kpiPending = document.getElementById('kpi-pending-count');
+      if (kpiPending) kpiPending.textContent = '1';
+    } catch (err) {
+      showToast('Approval Error', err.message, 'error');
+    }
+  }
+
+  async function confirmHitlReject() {
+    if (!activeHitlRecordId) return;
+    const approver = document.getElementById('hitl-approver-name')?.value.trim() || 'K. Raman (Lead Process Eng)';
+    try {
+      const res = await fetch('/api/records', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reject',
+          recordId: activeHitlRecordId,
+          approverName: approver,
+          rejectReason: 'Aborted due to unexpected header pressure fluctuations'
+        })
+      });
+      const data = await res.json();
+      closeModal('modal-hitl');
+      showToast('HITL Rejected', data.message || 'Action rejected and quarantined.', 'warning');
+      if (typeof loadRecordsData === 'function') loadRecordsData();
+      if (typeof loadAnalyticsData === 'function') loadAnalyticsData();
+    } catch (err) {
+      showToast('Rejection Error', err.message, 'error');
+    }
+  }
+
+  function inspectRecordById(recId) {
+    const rec = (cachedRecords || []).find(r => r.id === recId);
+    if (!rec) return;
+
+    document.getElementById('rec-detail-num').textContent = rec.recordNumber;
+    document.getElementById('rec-detail-unit').textContent = rec.plantUnit;
+    document.getElementById('rec-detail-title').textContent = rec.title;
+    document.getElementById('rec-detail-summary').textContent = rec.summary;
+    document.getElementById('rec-detail-tags').textContent = rec.details?.equipmentTag || 'N/A';
+    document.getElementById('rec-detail-criticality').textContent = rec.details?.criticality || 'MEDIUM';
+    document.getElementById('rec-detail-model').textContent = rec.details?.modelUsed || 'Llama-3-8B-Industrial';
+    document.getElementById('rec-detail-hash').textContent = rec.details?.auditHash || 'sha256-...';
+    document.getElementById('rec-detail-notes').textContent = rec.details?.technicalNotes || '';
+
+    const citContainer = document.getElementById('rec-detail-citations');
+    citContainer.innerHTML = '';
+    if (rec.details?.citations && rec.details.citations.length > 0) {
+      rec.details.citations.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-700 flex items-center justify-between font-mono shadow-2xs';
+        div.innerHTML = `
+          <span class="text-blue-700 font-bold">${c.document}</span>
+          <span class="text-slate-500 font-medium">${c.section} (p.${c.page})</span>
+        `;
+        citContainer.appendChild(div);
+      });
+    } else {
+      citContainer.innerHTML = '<span class="text-slate-400 italic font-mono text-[11px]">No citations.</span>';
+    }
+
+    document.getElementById('modal-record-detail')?.classList.remove('hidden');
+  }
+
+  function showDocumentDrawer(doc) {
+    if (!doc) return;
+    document.getElementById('vault-modal-num').textContent = doc.docNumber;
+    document.getElementById('vault-modal-status').textContent = doc.indexedStatus;
+    document.getElementById('vault-modal-class').textContent = doc.classification;
+    document.getElementById('vault-modal-title').textContent = doc.title;
+    document.getElementById('vault-modal-desc').textContent = doc.description;
+    document.getElementById('vault-modal-pages').textContent = `${doc.pagesCount} pgs / ${doc.vectorChunksCount} vectors`;
+    document.getElementById('vault-modal-unit').textContent = doc.plantUnit;
+    document.getElementById('vault-modal-model').textContent = doc.embeddingModel;
+    document.getElementById('vault-modal-score').textContent = doc.retrievalConfidence;
+    document.getElementById('vault-modal-excerpt').textContent = doc.excerptSnippet;
+    document.getElementById('vault-modal-hash').textContent = doc.checksumSha256;
+    document.getElementById('vault-modal-source').textContent = doc.sourceReference;
+
+    const tagsContainer = document.getElementById('vault-modal-tags');
+    tagsContainer.innerHTML = '';
+    doc.keyTags.forEach(t => {
+      const sp = document.createElement('span');
+      sp.className = 'px-2 py-0.5 rounded-md text-[10px] font-mono bg-blue-50 text-blue-700 border border-blue-200 font-semibold';
+      sp.textContent = t;
+      tagsContainer.appendChild(sp);
+    });
+
+    const copilotBtn = document.getElementById('btn-vault-query-copilot');
+    if (copilotBtn) {
+      copilotBtn.onclick = () => {
+        closeModal('modal-vault-detail');
+        switchTab('copilot');
+        setTimeout(() => {
+          submitPresetQuery(`Review operating guidelines in ${doc.docNumber}`);
+        }, 100);
+      };
+    }
+
+    document.getElementById('modal-vault-detail')?.classList.remove('hidden');
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal('modal-hitl');
+      closeModal('modal-record-detail');
+      closeModal('modal-vault-detail');
+      closeModal('modal-shortcuts');
+      closeModal('flyout-notifications');
+    }
+
+    const activeTag = document.activeElement.tagName.toLowerCase();
+    if (['input', 'textarea', 'select'].includes(activeTag)) return;
+
+    if (e.key === '1') switchTab('overview');
+    if (e.key === '2') switchTab('copilot');
+    if (e.key === '3') switchTab('workflow');
+    if (e.key === '4') switchTab('vault');
+    if (e.key === '5') switchTab('records');
+    if (e.key === '6') switchTab('analytics');
+    if (e.key === '7') switchTab('policy');
+    if (e.key === '8') switchTab('audit');
+    if (e.key === '9') switchTab('model-config');
+    if (e.key === '0') switchTab('access-control');
+
+    if (e.key === '/') {
+      e.preventDefault();
+      switchTab('copilot');
+      setTimeout(() => {
+        const chatInput = document.getElementById('chat-user-input');
+        if (chatInput) chatInput.focus();
+      }, 80);
+    }
+    if (e.key === '?') {
+      showKeyboardShortcutsModal();
+    }
+  });
+</script>

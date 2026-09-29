@@ -1,0 +1,142 @@
+---
+// Settings & Demo Controls View (Binance-Inspired Industrial System)
+---
+
+<div id="view-settings" class="app-view hidden space-y-4 animate-fadeIn">
+  <!-- Settings Header -->
+  <div class="ui-panel p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          SYSTEM PARAMETERS &amp; DEMO CONTROLS
+        </span>
+        <span class="text-xs text-slate-500 font-medium">SIH26117 Air-Gap Security Configuration</span>
+      </div>
+      <h2 class="text-base sm:text-lg font-bold tracking-tight text-slate-900 mt-1">
+        Platform Controls &amp; Benchmark State Reset
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Configure open-weight model serving, air-gap security constraints, and active operator personas.
+      </p>
+    </div>
+
+    <!-- Quick Reset Button -->
+    <button 
+      type="button" 
+      onclick="resetDemoState()"
+      class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
+    >
+      <svg class="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+      <span>Reset Benchmark State</span>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Card 1: Active Model Gateway -->
+    <div class="ui-panel p-5 space-y-3.5">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+        <div class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 text-xs font-mono font-bold">
+          CPU
+        </div>
+        <div>
+          <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Local Model Gateway Selector</h3>
+          <p class="text-[11px] text-slate-500">Open-weight models served via local vLLM / Ollama</p>
+        </div>
+      </div>
+
+      <div class="space-y-2.5">
+        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-blue-50/60 border-2 border-blue-500 hover:border-blue-600 cursor-pointer transition-all shadow-2xs">
+          <input type="radio" name="model-select" value="Llama-3-8B-Industrial (vLLM)" checked onchange="updateModelSelection(this.value)" class="mt-0.5 text-blue-600 focus:ring-blue-500 accent-blue-600" />
+          <div class="text-xs">
+            <div class="font-bold text-slate-900">Llama-3-8B-Industrial (vLLM Serving)</div>
+            <div class="text-slate-600 text-[11px] mt-0.5">High-throughput reasoning (84+ tok/s). Fine-tuned on refinery engineering manuals and SOPs.</div>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/90 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all shadow-2xs">
+          <input type="radio" name="model-select" value="Qwen-2.5-VL-7B (Local VLM)" onchange="updateModelSelection(this.value)" class="mt-0.5 text-blue-600 focus:ring-blue-500 accent-blue-600" />
+          <div class="text-xs">
+            <div class="font-bold text-slate-900">Qwen-2.5-VL-7B (Multimodal Vision VLM)</div>
+            <div class="text-slate-600 text-[11px] mt-0.5">Spatial-visual understanding of P&amp;ID schematics, ISA-5.1 symbols, and scanned PDF blueprints.</div>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/90 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all shadow-2xs">
+          <input type="radio" name="model-select" value="Mistral-7B-Plant (Ollama)" onchange="updateModelSelection(this.value)" class="mt-0.5 text-blue-600 focus:ring-blue-500 accent-blue-600" />
+          <div class="text-xs">
+            <div class="font-bold text-slate-900">Mistral-7B-Plant (Ollama Backend)</div>
+            <div class="text-slate-600 text-[11px] mt-0.5">Telemetry log extraction, incident audits, and fast edge reasoning.</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Card 2: Security & Air-Gap Boundary -->
+    <div class="ui-panel p-5 space-y-3.5">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+        <div class="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 text-xs font-mono font-bold">
+          SEC
+        </div>
+        <div>
+          <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Air-Gap &amp; Policy Gate Sensitivity</h3>
+          <p class="text-[11px] text-slate-500">Zero data egress &amp; automated redaction parameters</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label for="settings-policy-level" class="block text-[10px] font-mono text-slate-500 font-bold uppercase mb-1.5">Policy Enforcement Level</label>
+          <select 
+            id="settings-policy-level" 
+            onchange="updatePolicyLevel(this.value)"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-2xs"
+          >
+            <option value="STRICT_MILITARY">Strict Military/Gov-Grade (Mask proprietary catalyst + PII)</option>
+            <option value="STANDARD_INDUSTRIAL">Standard Industrial Compliance (Mask PII only)</option>
+            <option value="AUDIT_ONLY">Audit-Only (Log warnings without blocking)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="settings-airgap-mode" class="block text-[10px] font-mono text-slate-500 font-bold uppercase mb-1.5">Network Isolation Mode</label>
+          <select 
+            id="settings-airgap-mode" 
+            onchange="updateAirgapMode(this.value)"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-2xs"
+          >
+            <option value="STRICT_AIR_GAP">Strict Air-Gap (Purdue Level 3 DMZ - All external sockets dropped)</option>
+            <option value="MONITORED_LAN">Monitored Local LAN (Isolated intranet only)</option>
+          </select>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-[11px] text-emerald-900 space-y-1">
+          <div class="font-bold flex items-center gap-1.5 font-mono text-emerald-800">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Hardware Egress Monitor: ACTIVE
+          </div>
+          <div class="text-slate-600 text-[11px] leading-relaxed">eBPF network driver drops all SYN packets addressed to non-RFC1918 subnets. Egress: 0.00 KB.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function updateModelSelection(modelName) {
+    const el = document.getElementById('header-model-indicator');
+    if (el) el.textContent = modelName;
+    const copilotEl = document.getElementById('copilot-engine-label');
+    if (copilotEl) copilotEl.textContent = modelName;
+    showToast('Model Switched', `Inference gateway configured for ${modelName}.`, 'success');
+  }
+
+  function updatePolicyLevel(level) {
+    showToast('Policy Level Updated', `Sensitivity set to ${level}.`, 'info');
+  }
+
+  function updateAirgapMode(mode) {
+    showToast('Air-Gap Mode Active', `Network policy enforcing ${mode}. Outbound egress locked at 0.00 KB.`, 'info');
+  }
+</script>

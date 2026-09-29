@@ -1,0 +1,333 @@
+---
+import { INITIAL_VAULT_DOCUMENTS } from '../data/vaultDocuments';
+
+const totalPages = INITIAL_VAULT_DOCUMENTS.reduce((sum, d) => sum + d.pagesCount, 0);
+const totalVectors = INITIAL_VAULT_DOCUMENTS.reduce((sum, d) => sum + d.vectorChunksCount, 0);
+---
+
+<div id="view-vault" class="app-view hidden space-y-4 animate-fadeIn">
+  <!-- Knowledge Vault Header Card -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          KNOWLEDGE VAULT
+        </span>
+        <span class="text-xs text-slate-500">On-Premise Industrial Documentation &amp; Vector Index</span>
+      </div>
+      <h2 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900 mt-1">
+        Plant Documentation &amp; Standard Operating Procedures
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Indexed SOP manuals, P&amp;ID schematics, OEM equipment manuals, alarm logs, and engineering standards.
+      </p>
+    </div>
+
+    <!-- Active Counters Strip -->
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono">
+        <span class="text-slate-500 font-medium">DOCUMENTS:</span> <strong class="text-slate-900 tabular-nums ml-1" id="vault-doc-count">{INITIAL_VAULT_DOCUMENTS.length}</strong>
+      </div>
+      <div class="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono">
+        <span class="text-slate-500 font-medium">PAGES:</span> <strong class="text-blue-600 tabular-nums ml-1">{totalPages}</strong>
+      </div>
+      <div class="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono">
+        <span class="text-slate-500 font-medium">VECTORS:</span> <strong class="text-emerald-600 tabular-nums ml-1">{totalVectors.toLocaleString()}</strong>
+      </div>
+      <button 
+        type="button" 
+        onclick="reindexKnowledgeVault()"
+        id="btn-reindex-vault"
+        class="btn-secondary-light text-xs py-1.5 px-3 shadow-xs"
+        title="Trigger offline re-indexing check against Qdrant"
+      >
+        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Re-Sync Qdrant</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters & Search Bar Card -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <!-- Search -->
+      <div>
+        <label for="vault-search-input" class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Search Documents &amp; Tags</label>
+        <div class="relative">
+          <input 
+            type="text" 
+            id="vault-search-input"
+            oninput="filterVaultClientSide()"
+            placeholder="Search P-204, DWG-CDU-401, PSV-2041, H2S..." 
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          />
+          <div class="absolute right-3 top-2.5 text-slate-400">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type Filter -->
+      <div>
+        <label for="vault-type-select" class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Document Type</label>
+        <select 
+          id="vault-type-select" 
+          onchange="filterVaultClientSide()"
+          class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        >
+          <option value="ALL">All Types ({INITIAL_VAULT_DOCUMENTS.length})</option>
+          <option value="SOP">SOP (Standard Operating Procedures)</option>
+          <option value="P&ID">P&amp;ID Drawings &amp; Blueprints</option>
+          <option value="Manual">Equipment &amp; OEM Manuals</option>
+          <option value="Alarm Log">Alarm Logs &amp; Matrices</option>
+          <option value="Standard">Engineering Standards (API)</option>
+        </select>
+      </div>
+
+      <!-- Plant Unit Filter -->
+      <div>
+        <label for="vault-unit-select" class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Plant Unit</label>
+        <select 
+          id="vault-unit-select" 
+          onchange="filterVaultClientSide()"
+          class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        >
+          <option value="ALL">All Refinery Units</option>
+          <option value="CDU-1">CDU-1 (Crude Distillation)</option>
+          <option value="HCU-3">HCU-3 (Hydrocracker Unit)</option>
+          <option value="FCCU-2">FCCU-2 (Catalytic Cracker)</option>
+          <option value="SRU-2">SRU-2 (Sulfur Recovery)</option>
+          <option value="Utilities">Utilities &amp; Turbines</option>
+          <option value="Tank Farm">Tank Farm</option>
+          <option value="Plant-Wide">Plant-Wide Standards</option>
+        </select>
+      </div>
+
+      <!-- Classification Filter -->
+      <div>
+        <label for="vault-class-select" class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Classification</label>
+        <select 
+          id="vault-class-select" 
+          onchange="filterVaultClientSide()"
+          class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        >
+          <option value="ALL">All Classifications</option>
+          <option value="CONFIDENTIAL">Confidential</option>
+          <option value="PROPRIETARY">Proprietary</option>
+          <option value="RESTRICTED">Restricted</option>
+          <option value="INTERNAL">Internal</option>
+          <option value="PUBLIC">Public</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents Table Card -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead>
+          <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-semibold uppercase text-slate-500">
+            <th class="py-3 px-4">Doc Identifier</th>
+            <th class="py-3 px-4">Title &amp; Scope</th>
+            <th class="py-3 px-4">Type</th>
+            <th class="py-3 px-4">Unit</th>
+            <th class="py-3 px-4">Pages / Vectors</th>
+            <th class="py-3 px-4">Classification</th>
+            <th class="py-3 px-4">Index Status</th>
+            <th class="py-3 px-4 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="vault-table-body" class="divide-y divide-slate-100">
+          {INITIAL_VAULT_DOCUMENTS.map((doc) => {
+            const isSOP = doc.type === 'SOP';
+            const isPID = doc.type === 'P&ID';
+            const typeBadgeColor = isSOP
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+              : isPID
+              ? "bg-blue-50 text-blue-700 border-blue-200"
+              : "bg-indigo-50 text-indigo-700 border-indigo-200";
+
+            const classBadgeColor = doc.classification === 'CONFIDENTIAL'
+              ? "bg-rose-50 text-rose-700 border-rose-200"
+              : doc.classification === 'PROPRIETARY'
+              ? "bg-amber-50 text-amber-700 border-amber-200"
+              : doc.classification === 'RESTRICTED'
+              ? "bg-purple-50 text-purple-700 border-purple-200"
+              : "bg-slate-100 text-slate-700 border-slate-200";
+
+            return (
+              <tr 
+                class="vault-doc-row hover:bg-slate-50/80 transition-colors"
+                data-id={doc.id}
+                data-number={doc.docNumber}
+                data-title={doc.title}
+                data-type={doc.type}
+                data-unit={doc.plantUnit}
+                data-class={doc.classification}
+                data-tags={doc.keyTags.join(' ')}
+              >
+                <!-- Doc Number -->
+                <td class="py-3 px-4 font-mono font-bold text-blue-600 whitespace-nowrap">
+                  {doc.docNumber}
+                </td>
+
+                <!-- Title & Tags -->
+                <td class="py-3 px-4 max-w-xs sm:max-w-md">
+                  <div class="font-semibold text-slate-900 truncate">{doc.title}</div>
+                  <div class="text-[11px] text-slate-500 truncate mt-0.5">{doc.description}</div>
+                  <div class="flex flex-wrap gap-1 mt-1.5">
+                    {doc.keyTags.map((tag) => (
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-100 text-slate-600 border border-slate-200">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+
+                <!-- Type -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${typeBadgeColor}`}>
+                    {doc.type}
+                  </span>
+                </td>
+
+                <!-- Unit -->
+                <td class="py-3 px-4 font-mono text-xs text-slate-700 whitespace-nowrap font-medium">
+                  {doc.plantUnit}
+                </td>
+
+                <!-- Pages / Vectors -->
+                <td class="py-3 px-4 font-mono text-xs tabular-nums whitespace-nowrap">
+                  <span class="text-slate-900 font-semibold">{doc.pagesCount} pgs</span>
+                  <span class="text-slate-300"> / </span>
+                  <span class="text-emerald-600 font-medium">{doc.vectorChunksCount} chunks</span>
+                </td>
+
+                <!-- Classification -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border ${classBadgeColor}`}>
+                    {doc.classification}
+                  </span>
+                </td>
+
+                <!-- Index Status -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>INDEXED</span>
+                  </span>
+                </td>
+
+                <!-- Actions -->
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <button 
+                    type="button" 
+                    onclick={`openVaultDetailDrawer(${JSON.stringify(doc.id)})`}
+                    class="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                  >
+                    Inspect
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty search result state -->
+    <div id="vault-empty-state" class="hidden p-10 text-center space-y-3">
+      <div class="text-slate-500 text-sm">No indexed industrial documents match your search criteria.</div>
+      <button 
+        type="button" 
+        onclick="resetVaultFilters()"
+        class="btn-secondary-light text-xs py-1.5 px-3"
+      >
+        Clear Filters
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="vault-raw-data" set:html={JSON.stringify(INITIAL_VAULT_DOCUMENTS)} />
+
+<script is:inline>
+  function filterVaultClientSide() {
+    const search = (document.getElementById('vault-search-input')?.value || '').toLowerCase().trim();
+    const type = document.getElementById('vault-type-select')?.value || 'ALL';
+    const unit = document.getElementById('vault-unit-select')?.value || 'ALL';
+    const classification = document.getElementById('vault-class-select')?.value || 'ALL';
+
+    const rows = document.querySelectorAll('.vault-doc-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const rowNumber = (row.getAttribute('data-number') || '').toLowerCase();
+      const rowTitle = (row.getAttribute('data-title') || '').toLowerCase();
+      const rowType = row.getAttribute('data-type');
+      const rowUnit = row.getAttribute('data-unit');
+      const rowClass = row.getAttribute('data-class');
+      const rowTags = (row.getAttribute('data-tags') || '').toLowerCase();
+
+      const matchSearch = !search || rowNumber.includes(search) || rowTitle.includes(search) || rowTags.includes(search);
+      const matchType = type === 'ALL' || rowType === type;
+      const matchUnit = unit === 'ALL' || rowUnit === unit;
+      const matchClass = classification === 'ALL' || rowClass === classification;
+
+      if (matchSearch && matchType && matchUnit && matchClass) {
+        row.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        row.classList.add('hidden');
+      }
+    });
+
+    const empty = document.getElementById('vault-empty-state');
+    if (empty) {
+      if (visibleCount === 0) empty.classList.remove('hidden');
+      else empty.classList.add('hidden');
+    }
+
+    const countEl = document.getElementById('vault-doc-count');
+    if (countEl) countEl.textContent = visibleCount;
+  }
+
+  function resetVaultFilters() {
+    const searchInput = document.getElementById('vault-search-input');
+    const typeSelect = document.getElementById('vault-type-select');
+    const unitSelect = document.getElementById('vault-unit-select');
+    const classSelect = document.getElementById('vault-class-select');
+    if (searchInput) searchInput.value = '';
+    if (typeSelect) typeSelect.value = 'ALL';
+    if (unitSelect) unitSelect.value = 'ALL';
+    if (classSelect) classSelect.value = 'ALL';
+    filterVaultClientSide();
+  }
+
+  function openVaultDetailDrawer(docId) {
+    const rawDataEl = document.getElementById('vault-raw-data');
+    if (!rawDataEl) return;
+    const docs = JSON.parse(rawDataEl.textContent || '[]');
+    const doc = docs.find(d => d.id === docId);
+    if (!doc) return;
+
+    if (typeof showDocumentDrawer === 'function') {
+      showDocumentDrawer(doc);
+    }
+  }
+
+  function reindexKnowledgeVault() {
+    const btn = document.getElementById('btn-reindex-vault');
+    if (btn) btn.disabled = true;
+    showToast('Qdrant Vector Sync', 'Scanning local document repository and verifying HNSW index hash parity…', 'info');
+    setTimeout(() => {
+      showToast('Index Up To Date', '14,820 vectors across 12 documents verified in local Qdrant instance.', 'success');
+      if (btn) btn.disabled = false;
+    }, 900);
+  }
+</script>

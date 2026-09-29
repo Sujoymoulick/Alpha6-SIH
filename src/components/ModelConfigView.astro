@@ -1,0 +1,198 @@
+---
+// Model Configuration & On-Premise Gateway Controller
+---
+
+<div id="view-model-config" class="app-view hidden space-y-4 animate-fadeIn">
+  <!-- Header -->
+  <div class="ui-panel p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          MODEL GATEWAY CONFIGURATION
+        </span>
+        <span class="text-xs text-slate-500 font-medium">On-Premise vLLM &amp; Ollama Checkpoint Registry</span>
+      </div>
+      <h2 class="text-base sm:text-lg font-bold tracking-tight text-slate-900 mt-1">
+        Local Serving Engine &amp; Hyperparameter Controls
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Configure open-weight model instances, quantization profiles, and context allocations inside the air-gapped host.
+      </p>
+    </div>
+
+    <!-- Active Indicator -->
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-700 font-semibold flex items-center gap-1.5 shadow-2xs">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        HOST ENGINE: vLLM v0.6.2 (ONLINE)
+      </span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- Left Column: Model Registry & Selector (7 cols) -->
+    <div class="lg:col-span-7 space-y-3">
+      <div class="ui-panel p-5 space-y-3.5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Approved Open-Weight Models</h3>
+          <span class="text-[10px] font-mono text-slate-400 font-semibold">FIPS 140-2 VERIFIED CHECKPOINTS</span>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Model Option 1 -->
+          <label class="block p-4 rounded-xl bg-blue-50/60 border-2 border-blue-500 shadow-2xs hover:border-blue-600 cursor-pointer transition-all">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <input type="radio" name="model-config-radio" value="Llama-3-8B-Industrial (vLLM)" checked onchange="handleModelConfigChange(this.value)" class="mt-1 text-blue-600 focus:ring-blue-500 accent-blue-600" />
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Llama-3-8B-Industrial (vLLM Backend)</div>
+                  <div class="text-[11px] text-slate-600 mt-0.5 leading-snug">
+                    Fine-tuned on 1.4M tokens of refinery SOPs, API-520 calculation sheets, and DCS alarm response matrices.
+                  </div>
+                  <div class="flex flex-wrap gap-2 text-[10px] font-mono mt-2 text-slate-500">
+                    <span class="text-emerald-700 font-semibold">Throughput: ~84 tok/s</span>
+                    <span>•</span>
+                    <span class="text-blue-700 font-semibold">VRAM: 19.4 GB</span>
+                    <span>•</span>
+                    <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-medium">AWQ 4-bit</span>
+                  </div>
+                </div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-100/80 text-emerald-800 border border-emerald-300 shrink-0">
+                ACTIVE PRODUCTION
+              </span>
+            </div>
+          </label>
+
+          <!-- Model Option 2 -->
+          <label class="block p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <input type="radio" name="model-config-radio" value="Qwen-2.5-VL-7B (Local VLM)" onchange="handleModelConfigChange(this.value)" class="mt-1 text-blue-600 focus:ring-blue-500 accent-blue-600" />
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Qwen-2.5-VL-7B (Multimodal Vision Engine)</div>
+                  <div class="text-[11px] text-slate-600 mt-0.5 leading-snug">
+                    Spatial-visual tokenization of high-resolution P&amp;ID blueprints, CAD drawings, and ISA-5.1 instrument symbols.
+                  </div>
+                  <div class="flex flex-wrap gap-2 text-[10px] font-mono mt-2 text-slate-500">
+                    <span class="text-emerald-700 font-semibold">Throughput: ~48 tok/s</span>
+                    <span>•</span>
+                    <span class="text-blue-700 font-semibold">VRAM: 16.2 GB</span>
+                    <span>•</span>
+                    <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-medium">Vision Native</span>
+                  </div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                STANDBY
+              </span>
+            </div>
+          </label>
+
+          <!-- Model Option 3 -->
+          <label class="block p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <input type="radio" name="model-config-radio" value="Mistral-7B-Plant (Ollama)" onchange="handleModelConfigChange(this.value)" class="mt-1 text-blue-600 focus:ring-blue-500 accent-blue-600" />
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Mistral-7B-Plant (Ollama Edge Runner)</div>
+                  <div class="text-[11px] text-slate-600 mt-0.5 leading-snug">
+                    Edge SCADA telemetry packet ingestion, incident reconstruction, and JSON structured schema validation.
+                  </div>
+                  <div class="flex flex-wrap gap-2 text-[10px] font-mono mt-2 text-slate-500">
+                    <span class="text-emerald-700 font-semibold">Throughput: ~72 tok/s</span>
+                    <span>•</span>
+                    <span class="text-blue-700 font-semibold">VRAM: 14.8 GB</span>
+                    <span>•</span>
+                    <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-medium">GGUF Q4_K_M</span>
+                  </div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                STANDBY
+              </span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Hyperparameters & Execution Constraints (5 cols) -->
+    <div class="lg:col-span-5 space-y-3">
+      <div class="ui-panel p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Serving Hyperparameters</h3>
+          <span class="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">ZERO HALLUCINATION</span>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <!-- Temperature -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-mono mb-1.5">
+              <span class="text-slate-500 font-semibold">TEMPERATURE (DETERMINISM):</span>
+              <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200" id="cfg-temp-val">0.10</span>
+            </div>
+            <input 
+              type="range" 
+              min="0.0" 
+              max="0.5" 
+              step="0.05" 
+              value="0.10"
+              oninput="document.getElementById('cfg-temp-val').textContent = parseFloat(this.value).toFixed(2)"
+              class="w-full accent-blue-600 cursor-pointer"
+            />
+            <div class="text-[10px] text-slate-400 mt-1">Low temperature forces strict adherence to retrieved SOP chunks.</div>
+          </div>
+
+          <!-- Max Context Length -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-mono mb-1.5">
+              <span class="text-slate-500 font-semibold">CONTEXT WINDOW:</span>
+              <span class="text-slate-900 font-bold">8,192 tokens</span>
+            </div>
+            <select class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 text-slate-800 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none shadow-2xs">
+              <option value="8192">8,192 tokens (Optimal VRAM)</option>
+              <option value="16384">16,384 tokens (Deep Manual Scan)</option>
+              <option value="32768">32,768 tokens (Multi-P&amp;ID Circuit Analysis)</option>
+            </select>
+          </div>
+
+          <!-- PagedAttention Block Size -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-mono mb-1.5">
+              <span class="text-slate-500 font-semibold">PAGEDATTENTION BLOCK:</span>
+              <span class="text-blue-700 font-bold font-mono">16 bytes (Paged)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 font-mono">
+              KV Cache Paged Memory Allocation: 100% contiguous GPU memory without fragmentation.
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            onclick="saveModelConfig()"
+            class="w-full btn-primary-blue text-xs py-2.5 mt-2 font-semibold shadow-xs"
+          >
+            Apply &amp; Warm Up Gateway Checkpoint
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function handleModelConfigChange(modelName) {
+    const headerIndicator = document.getElementById('header-model-indicator');
+    const copilotLabel = document.getElementById('copilot-engine-label');
+    const overviewName = document.getElementById('llm-status-name');
+    if (headerIndicator) headerIndicator.textContent = modelName;
+    if (copilotLabel) copilotLabel.textContent = modelName;
+    if (overviewName) overviewName.textContent = modelName.split(' ')[0];
+    showToast('Model Checkpoint Switched', `Active inference gateway set to ${modelName}.`, 'success');
+  }
+
+  function saveModelConfig() {
+    showToast('Parameters Applied', 'Local vLLM serving configuration reloaded with zero downtime.', 'success');
+  }
+</script>

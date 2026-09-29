@@ -1,23 +1,516 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import '../styles/global.css';
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Alpha-6 | Sovereign Industrial AI Operations Console (SIH26117)",
+  description = "Sovereign On-Premise Agentic AI Workbench using Open-Weight Multimodal LLMs for Confidential Industrial Work — Smart India Hackathon 2026 (SIH26117)."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <!-- Crisp typography: Plus Jakarta Sans for UI + JetBrains Mono for telemetry -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body class="h-screen w-screen overflow-hidden flex flex-row antialiased selection:bg-blue-100 selection:text-blue-900">
+    <!-- Accessible Skip Link -->
+    <a 
+      href="#main-content" 
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-1.5 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:font-semibold text-xs focus-visible:outline-none"
+    >
+      Skip to main console
+    </a>
+
+    <!-- 1. LEFT SLIM ICON NAVIGATION RAIL (Clean floating rail on dotted grid bg) -->
+    <aside 
+      id="app-sidebar"
+      class="w-20 h-[calc(100vh-24px)] m-3 mr-0 bg-white rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between items-center py-4 shrink-0 select-none z-20"
+      aria-label="Application Rail Navigation"
+    >
+        <!-- Top Section: Brand Logo -->
+        <div class="flex flex-col items-center gap-1">
+          <a 
+            href="#overview" 
+            onclick="switchTab('overview')"
+            class="group flex flex-col items-center gap-1 focus:outline-none cursor-pointer"
+            title="Alpha-6 Sovereign Industrial AI"
+          >
+            <!-- Hexagonal / Monogram Badge in Green (matches reference screenshot logo) -->
+            <div class="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span class="text-[10px] font-bold tracking-tight text-slate-800 font-sans group-hover:text-blue-600 transition-colors">
+              Alpha-6
+            </span>
+          </a>
+        </div>
+
+        <!-- Center Vertical Icon Stack -->
+        <nav class="flex flex-col items-center gap-1.5 w-full px-2" role="tablist">
+          <!-- 1. Dashboard -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="true"
+            id="rail-nav-overview"
+            onclick="switchTab('overview')"
+            class="rail-btn active group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 transition-all cursor-pointer bg-blue-50 text-blue-600 border border-blue-100"
+            title="Overview Dashboard"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Dashboard</span>
+          </button>
+
+          <!-- 2. Plant Copilot -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="false"
+            id="rail-nav-copilot"
+            onclick="switchTab('copilot')"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="Plant Copilot"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Copilot</span>
+          </button>
+
+          <!-- 3. Agent Studio -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="false"
+            id="rail-nav-workflow"
+            onclick="switchTab('workflow')"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="Multimodal Agent Studio"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Studio</span>
+          </button>
+
+          <!-- 4. Knowledge Vault -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="false"
+            id="rail-nav-vault"
+            onclick="switchTab('vault')"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="Knowledge Vault"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Vault</span>
+          </button>
+
+          <!-- 5. Operational Records (with pending badge) -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="false"
+            id="rail-nav-records"
+            onclick="switchTab('records')"
+            class="rail-btn relative group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="Operational Records"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Records</span>
+            <span class="absolute top-1 right-2.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center tabular-nums" id="rail-pending-badge">2</span>
+          </button>
+
+          <!-- 6. Telemetry -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="false"
+            id="rail-nav-analytics"
+            onclick="switchTab('analytics')"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="System Telemetry"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Telemetry</span>
+          </button>
+
+          <!-- 7. Policy Engine -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="false"
+            id="rail-nav-policy"
+            onclick="switchTab('policy')"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="Policy Engine"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Policy</span>
+          </button>
+
+          <!-- 8. Audit Trail -->
+          <button 
+            type="button"
+            role="tab"
+            aria-selected="false"
+            id="rail-nav-audit"
+            onclick="switchTab('audit')"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="Cryptographic Audit Trail"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Audit</span>
+          </button>
+        </nav>
+
+        <!-- Bottom Actions (Help & Settings) -->
+        <div class="flex flex-col items-center gap-2 w-full px-2 pt-2 border-t border-slate-100">
+          <!-- Help / Shortcuts -->
+          <button 
+            type="button"
+            onclick="showKeyboardShortcutsModal()"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="Keyboard Shortcuts (⌘K)"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Help</span>
+          </button>
+
+          <!-- Settings -->
+          <button 
+            type="button"
+            id="rail-nav-settings"
+            onclick="switchTab('settings')"
+            class="rail-btn group w-full py-2 px-1 rounded-2xl flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 hover:bg-slate-50 border border-transparent transition-all cursor-pointer"
+            title="System Settings"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="text-[10px] font-medium leading-none">Settings</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- 2. MAIN WORKSPACE (Clean floating header + dotted grid scrollable viewport) -->
+      <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden p-3 space-y-3">
+        
+        <!-- TOP NAVIGATION BAR (Clean floating bar on dotted grid bg) -->
+        <header class="h-14 px-4 sm:px-5 bg-white border border-slate-200/90 rounded-2xl shadow-xs flex items-center justify-between shrink-0 select-none z-10">
+          
+          <!-- LEFT: Pill Tabs (Dashboard, Bookings/Copilot, Studio, Newsroom/Vault, Documents/Records) -->
+          <div class="flex items-center gap-1.5 overflow-x-auto py-1" role="tablist">
+            <button 
+              type="button" 
+              role="tab"
+              id="top-pill-overview"
+              onclick="switchTab('overview')"
+              class="top-nav-pill active px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer bg-blue-50 text-blue-600 shadow-xs"
+            >
+              Dashboard
+            </button>
+
+            <button 
+              type="button" 
+              role="tab"
+              id="top-pill-copilot"
+              onclick="switchTab('copilot')"
+              class="top-nav-pill px-4 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            >
+              Plant Copilot
+            </button>
+
+            <button 
+              type="button" 
+              role="tab"
+              id="top-pill-workflow"
+              onclick="switchTab('workflow')"
+              class="top-nav-pill px-4 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            >
+              Agent Studio
+            </button>
+
+            <button 
+              type="button" 
+              role="tab"
+              id="top-pill-vault"
+              onclick="switchTab('vault')"
+              class="top-nav-pill px-4 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            >
+              Knowledge Vault
+            </button>
+
+            <button 
+              type="button" 
+              role="tab"
+              id="top-pill-records"
+              onclick="switchTab('records')"
+              class="top-nav-pill px-4 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            >
+              Operational Records
+            </button>
+
+            <button 
+              type="button" 
+              role="tab"
+              id="top-pill-analytics"
+              onclick="switchTab('analytics')"
+              class="top-nav-pill hidden lg:inline-flex px-4 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            >
+              Telemetry
+            </button>
+
+            <button 
+              type="button" 
+              role="tab"
+              id="top-pill-policy"
+              onclick="switchTab('policy')"
+              class="top-nav-pill hidden xl:inline-flex px-4 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            >
+              Policy Engine
+            </button>
+          </div>
+
+          <!-- RIGHT: Search Bar, Notifications, User Avatar -->
+          <div class="flex items-center gap-3">
+            <!-- Search Input with ⌘ F (Matching Screenshot) -->
+            <div class="relative hidden sm:flex items-center">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input 
+                type="text" 
+                id="global-search-input"
+                placeholder="Search anything..." 
+                class="bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200/90 rounded-xl pl-9 pr-11 py-1.5 text-xs text-slate-800 placeholder-slate-400 w-52 sm:w-60 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              />
+              <span class="absolute right-2.5 text-[10px] font-mono text-slate-400 border border-slate-200 bg-white rounded px-1.5 py-0.5 pointer-events-none">
+                ⌘ F
+              </span>
+            </div>
+
+            <!-- Mail / Inbox Button with notification dot -->
+            <button 
+              type="button" 
+              onclick="switchTab('records')"
+              class="relative p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              title="Escrow Tasks"
+              aria-label="Escrow Tasks"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+            </button>
+
+            <!-- Bell Notification Button with notification dot -->
+            <button 
+              type="button" 
+              onclick="toggleNotifications()"
+              class="relative p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              title="System Notifications"
+              aria-label="View system notifications"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span id="top-bell-badge" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+            </button>
+
+            <!-- User Profile Avatar with dropdown arrow -->
+            <div class="flex items-center gap-1.5 pl-1 cursor-pointer group" onclick="switchTab('access-control')">
+              <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-200 flex items-center justify-center bg-blue-100 text-blue-700 font-semibold text-xs shadow-xs">
+                KR
+              </div>
+              <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE CONTENT VIEWPORT (Dotted grid background shows directly through) -->
+        <main class="flex-1 overflow-y-auto pr-1 pb-4" id="main-content">
+          <slot />
+        </main>
+      </div>
+
+    <!-- Accessible Toast Container -->
+    <div 
+      id="toast-container" 
+      aria-live="polite" 
+      aria-atomic="true" 
+      class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"
+    ></div>
+
+    <!-- Global Client Script -->
+    <script is:inline>
+      const ALL_TABS = [
+        'overview', 'copilot', 'workflow', 'vault', 'records',
+        'analytics', 'policy', 'audit', 'model-config', 'access-control', 'settings'
+      ];
+
+      function switchTab(tabName) {
+        if (!ALL_TABS.includes(tabName)) tabName = 'overview';
+
+        // Hide all views
+        document.querySelectorAll('.app-view').forEach(v => v.classList.add('hidden'));
+
+        // Show target view
+        const target = document.getElementById(`view-${tabName}`);
+        if (target) {
+          target.classList.remove('hidden');
+        }
+
+        // Update rail navigation buttons
+        document.querySelectorAll('.rail-btn').forEach(btn => {
+          btn.classList.remove('active', 'bg-blue-50', 'text-blue-600', 'border-blue-100');
+          btn.classList.add('text-slate-400', 'border-transparent');
+          btn.setAttribute('aria-selected', 'false');
+        });
+
+        const activeRailBtn = document.getElementById(`rail-nav-${tabName}`);
+        if (activeRailBtn) {
+          activeRailBtn.classList.add('active', 'bg-blue-50', 'text-blue-600', 'border-blue-100');
+          activeRailBtn.classList.remove('text-slate-400', 'border-transparent');
+          activeRailBtn.setAttribute('aria-selected', 'true');
+        }
+
+        // Update top pill buttons
+        document.querySelectorAll('.top-nav-pill').forEach(pill => {
+          pill.classList.remove('active', 'bg-blue-50', 'text-blue-600', 'font-semibold', 'shadow-xs');
+          pill.classList.add('text-slate-500', 'font-medium');
+          pill.setAttribute('aria-selected', 'false');
+        });
+
+        const activeTopPill = document.getElementById(`top-pill-${tabName}`);
+        if (activeTopPill) {
+          activeTopPill.classList.add('active', 'bg-blue-50', 'text-blue-600', 'font-semibold', 'shadow-xs');
+          activeTopPill.classList.remove('text-slate-500', 'font-medium');
+          activeTopPill.setAttribute('aria-selected', 'true');
+        }
+
+        if (window.history.pushState) {
+          window.history.pushState(null, '', `#${tabName}`);
+        }
+      }
+
+      function showToast(title, message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-200 flex items-start gap-3 p-3.5 rounded-2xl bg-white border border-slate-200/90 text-xs shadow-xl ' + 
+          (type === 'success' ? 'border-emerald-200 text-slate-800' :
+           type === 'error' ? 'border-rose-200 text-slate-800' :
+           type === 'warning' ? 'border-amber-200 text-slate-800' :
+           'border-blue-200 text-slate-800');
+
+        const iconDot = type === 'success' 
+          ? '<span class="w-2.5 h-2.5 mt-1 rounded-full bg-emerald-500 shrink-0"></span>'
+          : type === 'error'
+          ? '<span class="w-2.5 h-2.5 mt-1 rounded-full bg-rose-500 shrink-0"></span>'
+          : type === 'warning'
+          ? '<span class="w-2.5 h-2.5 mt-1 rounded-full bg-amber-500 shrink-0"></span>'
+          : '<span class="w-2.5 h-2.5 mt-1 rounded-full bg-blue-600 shrink-0"></span>';
+
+        toast.innerHTML = `
+          ${iconDot}
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-slate-900 leading-tight font-sans">${title}</div>
+            <div class="text-slate-500 mt-0.5 leading-snug font-sans">${message}</div>
+          </div>
+          <button type="button" class="text-slate-400 hover:text-slate-700" aria-label="Close toast" onclick="this.parentElement.remove()">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        `;
+
+        container.appendChild(toast);
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-x-4');
+          setTimeout(() => toast.remove(), 250);
+        }, 4000);
+      }
+
+      async function resetDemoState() {
+        const btn = document.getElementById('btn-quick-reset');
+        if (btn) btn.disabled = true;
+        try {
+          const res = await fetch('/api/demo/reset', { method: 'POST' });
+          const data = await res.json();
+          showToast('Benchmark State Restored', data.message || 'All records and telemetry restored.', 'success');
+          window.dispatchEvent(new CustomEvent('demo-reset'));
+          if (typeof loadRecordsData === 'function') loadRecordsData();
+          if (typeof loadAnalyticsData === 'function') loadAnalyticsData();
+
+          const railPending = document.getElementById('rail-pending-badge');
+          if (railPending) railPending.textContent = '2';
+          const kpiPending = document.getElementById('kpi-pending-count');
+          if (kpiPending) kpiPending.textContent = '2';
+        } catch (err) {
+          showToast('Reset Failed', err.message, 'error');
+        } finally {
+          if (btn) btn.disabled = false;
+        }
+      }
+
+      // Live System Clock
+      function updateSystemClock() {
+        const clockEl = document.getElementById('system-clock-display');
+        if (!clockEl) return;
+        const now = new Date();
+        clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      setInterval(updateSystemClock, 1000);
+      updateSystemClock();
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && ALL_TABS.includes(hash)) {
+          switchTab(hash);
+        } else {
+          switchTab('overview');
+        }
+      });
+    </script>
+  </body>
+</html>

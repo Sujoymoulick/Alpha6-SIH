@@ -1,0 +1,141 @@
+---
+import { INITIAL_ANALYTICS } from '../data/analyticsData';
+---
+
+<div id="view-analytics" class="app-view hidden space-y-4 animate-fadeIn">
+  <!-- Analytics Header -->
+  <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
+          IMMUTABLE TELEMETRY LEDGER
+        </span>
+        <span class="text-xs text-slate-500">Zero Cloud Egress Active</span>
+      </div>
+      <h2 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900 mt-1">
+        Sovereign System Telemetry &amp; Hardware Utilization
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Continuous accelerator benchmarks, grounded answer accuracy, and cryptographic transaction logging.
+      </p>
+    </div>
+
+    <!-- Export Action -->
+    <button 
+      type="button" 
+      onclick="exportAuditLedger()"
+      class="btn-primary-blue text-xs py-2 px-4 shadow-xs"
+    >
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <span>Export Audit Ledger (JSON)</span>
+    </button>
+  </div>
+
+  <!-- Hardware Accelerator Status (On-Prem GPUs) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {INITIAL_ANALYTICS.gpuStats.map((gpu) => (
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-4">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-slate-900 flex items-center gap-2 font-mono">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            {gpu.device}
+          </span>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+            OFFLINE ACCELERATOR
+          </span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5 text-center">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-semibold">VRAM ALLOC</div>
+            <div class="text-sm sm:text-base font-bold text-blue-700 tabular-nums mt-1">{gpu.vramUsedGb} / {gpu.vramTotalGb} GB</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-semibold">TEMPERATURE</div>
+            <div class="text-sm sm:text-base font-bold text-amber-700 tabular-nums mt-1">{gpu.temperatureCelsius}°C</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-semibold">THROUGHPUT</div>
+            <div class="text-sm sm:text-base font-bold text-emerald-700 tabular-nums mt-1">{gpu.throughputTokensSec} tok/s</div>
+          </div>
+        </div>
+
+        <!-- VRAM Usage Progress Bar -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-500">
+            <span>Compute Utilization</span>
+            <span class="text-slate-900 font-bold tabular-nums">{gpu.utilizationPercent}%</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full bg-blue-600 rounded-full transition-all" style={`width: ${gpu.utilizationPercent}%`}></div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Query Distributions (Unit & Category) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- By Plant Unit -->
+    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-4">
+      <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Query Ingestion by Refinery Unit</h3>
+      <div class="space-y-3">
+        {INITIAL_ANALYTICS.queriesByUnit.map((item) => (
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-800 font-medium font-sans">{item.unit}</span>
+              <span class="text-slate-500 font-mono tabular-nums">{item.count} ({item.percentage}%)</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div class="h-full bg-blue-600 rounded-full" style={`width: ${item.percentage}%`}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- By Category -->
+    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-4">
+      <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Inquiries by Operational Category</h3>
+      <div class="space-y-3">
+        {INITIAL_ANALYTICS.queriesByCategory.map((item) => (
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-800 font-medium font-sans">{item.category}</span>
+              <span class="text-slate-500 font-mono tabular-nums">{item.count} ({item.percentage}%)</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full" style={`width: ${item.percentage}%`}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function exportAuditLedger() {
+    const mockAudit = {
+      timestamp: new Date().toISOString(),
+      plantCode: "MRPL-CDU1",
+      sovereigntyLevel: "AIR_GAPPED_L3",
+      totalQueriesProcessed: 3244,
+      citationAccuracyRate: 0.994,
+      ebpfOutboundPackets: 0,
+      merkleRoot: "0x8fae4b119280148ba761e05a8b7c3d219401"
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mockAudit, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `alpha6_telemetry_ledger_${Date.now()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+
+    showToast('Ledger Exported', 'Downloaded cryptographic JSON telemetry audit ledger.', 'success');
+  }
+</script>

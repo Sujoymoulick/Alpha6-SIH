@@ -1,0 +1,267 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #10b981;
+  --color-secondary: #06b6d4;
+  --color-tertiary: #f59e0b;
+  --color-neutral: #0b0e11;
+  --color-surface: #12161c;
+  --color-surface-card: #181a20;
+  --color-surface-elevated: #1e2329;
+  --color-on-surface: #f8fafc;
+  --color-text-secondary: #848e9c;
+  --color-text-muted: #5e6673;
+  --color-critical: #f6465d;
+
+  --color-action-yellow: #f0b90b;
+  --color-action-yellow-hover: #fcd535;
+  --color-action-yellow-dark: #d8a60a;
+  --color-hairline: #2b3139;
+  --color-system-green: #0ecb81;
+  --color-system-red: #f6465d;
+  --color-system-cyan: #06b6d4;
+  --color-system-amber: #f0b90b;
+
+  --font-headline-lg: "Plus Jakarta Sans";
+  --font-headline-md: "Plus Jakarta Sans";
+  --font-headline-sm: "Plus Jakarta Sans";
+  --font-body-md: "Plus Jakarta Sans";
+  --font-body-sm: "Plus Jakarta Sans";
+  --font-label-caps: "JetBrains Mono";
+  --font-mono-data: "JetBrains Mono";
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    background-color: #f1f5f9;
+    background-image: radial-gradient(#cbd5e1 1.25px, transparent 1.25px);
+    background-size: 20px 20px;
+    color: #1e293b;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+  }
+
+  /* Micro-scrollbar for dense industrial tables and panels */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+/* Executive Modern Dashboard Card Utilities */
+.ui-panel {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+}
+
+.ui-panel-subtle {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.ui-panel-elevated {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+}
+
+.ui-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.ui-card-elevated {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.ui-card-subtle {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+/* Hairline Grid Dividers */
+.hairline-border {
+  border-color: #e2e8f0;
+}
+
+.hairline-border-subtle {
+  border-color: #f1f5f9;
+}
+
+/* Tabular Numerals for Mission-Critical Telemetry */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Vibrant Blue Primary Action Button (Reference Design) */
+.btn-primary-blue {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 2px 0 rgba(29, 78, 216, 0.2);
+}
+.btn-primary-blue:hover {
+  background-color: #1e40af;
+  box-shadow: 0 4px 6px -1px rgba(29, 78, 216, 0.3);
+}
+.btn-primary-blue:active {
+  background-color: #172554;
+}
+.btn-primary-blue:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Backward-compatible alias for primary button */
+.btn-primary-yellow {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 2px 0 rgba(29, 78, 216, 0.2);
+}
+.btn-primary-yellow:hover {
+  background-color: #1e40af;
+  box-shadow: 0 4px 6px -1px rgba(29, 78, 216, 0.3);
+}
+.btn-primary-yellow:active {
+  background-color: #172554;
+}
+.btn-primary-yellow:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Secondary Button (Clean Light Surface) */
+.btn-secondary-dark, .btn-secondary-light {
+  background-color: #ffffff;
+  color: #334155;
+  font-weight: 500;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.btn-secondary-dark:hover, .btn-secondary-light:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* Subtle Status Pulse */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth fade in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

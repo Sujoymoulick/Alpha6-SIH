@@ -1,11 +1,56 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import OverviewView from '../components/OverviewView.astro';
+import CopilotView from '../components/CopilotView.astro';
+import StudioView from '../components/StudioView.astro';
+import VaultView from '../components/VaultView.astro';
+import RecordsView from '../components/RecordsView.astro';
+import AnalyticsView from '../components/AnalyticsView.astro';
+import PolicyView from '../components/PolicyView.astro';
+import AuditView from '../components/AuditView.astro';
+import ModelConfigView from '../components/ModelConfigView.astro';
+import AccessControlView from '../components/AccessControlView.astro';
+import SettingsView from '../components/SettingsView.astro';
+import Modals from '../components/Modals.astro';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Alpha-6 | Sovereign Industrial AI Operations Console (SIH26117)">
+  <!-- WORKSPACE -->
+  <!-- 1. Overview Command Center -->
+  <OverviewView />
+
+  <!-- 2. Plant Copilot (3-Pane Workspace) -->
+  <CopilotView />
+
+  <!-- 3. Multimodal P&ID & SOP Agent Studio -->
+  <StudioView />
+
+  <!-- 4. Knowledge Vault (Document Management & Vector Store) -->
+  <VaultView />
+
+  <!-- 5. Operational Records (Incidents & HITL Queue) -->
+  <RecordsView />
+
+  <!-- INTELLIGENCE -->
+  <!-- 6. System Telemetry & Accelerators -->
+  <AnalyticsView />
+
+  <!-- 7. Policy-as-Code Engine & Redaction Gate -->
+  <PolicyView />
+
+  <!-- 8. Immutable Cryptographic Audit Ledger -->
+  <AuditView />
+
+  <!-- SYSTEM -->
+  <!-- 9. Model Gateway Configuration -->
+  <ModelConfigView />
+
+  <!-- 10. Access Control & RBAC Matrix -->
+  <AccessControlView />
+
+  <!-- 11. Platform Controls & Demo Settings -->
+  <SettingsView />
+
+  <!-- Interactive Modals & Drawers -->
+  <Modals />
 </Layout>
